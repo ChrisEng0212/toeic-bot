@@ -1,2 +1,3 @@
-line-bot-sdk
-flask
+line-bot-sdk==1.16.0
+Flask==1.0.2flask
+gunicorn==19.9.0
