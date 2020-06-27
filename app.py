@@ -22,7 +22,7 @@ def hello_world():
 @app.route('/text/<string:tx>')
 def text(tx):
     try:
-        line_bot_api.push_message('U2dc560609e55883a4d869c88c0d912e7', TextSendMessage(text='Hello World!'))
+        line_bot_api.push_message('U2dc560609e55883a4d869c88c0d912e7', TextSendMessage(text=tx))
     except LineBotApiError as e:
         abort(400)
     return tx
