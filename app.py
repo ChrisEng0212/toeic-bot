@@ -19,6 +19,14 @@ handler = WebhookHandler('6c1237cad81c1ba197e04f6d179e906e')
 def hello_world():
     return 'Hello, World!'
 
+@app.route('/text/<string:tx>')
+def text(tx):
+    try:
+        line_bot_api.push_message('U2dc560609e55883a4d869c88c0d912e7', TextSendMessage(text='Hello World!'))
+    except LineBotApiError as e:
+        abort(400)
+    return tx
+
 
 
 # 監聽所有來自 /callback 的 Post Request
@@ -30,7 +38,7 @@ def callback():
     print('SIGNATURE', signature)
     # get request body as text
     body = request.get_data(as_text=True)
-    print('BODY', body)
+    print('BODY', str(body))
     app.logger.info("Request body: " + body)
     # handle webhook body
     try:
