@@ -1,4 +1,5 @@
 from flask import Flask, request, abort
+import json
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -39,8 +40,9 @@ def callback():
     print('SIGNATURE', signature)
 
     body_data = request.get_data()
-    print('TYPE', type(body_data))
-    print(body_data.events[0].type)
+
+    print(json.loads(body_data))
+        
     # get request body as text
     body = request.get_data(as_text=True)
     print('BODY', str(body))
