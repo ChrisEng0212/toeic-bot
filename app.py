@@ -41,7 +41,7 @@ def callback():
 
     body_json = json.loads(request.get_data())
 
-    print (body_json[events][0])
+    print (body_json['events'][0])    
     
     # get request body as text
     body = request.get_data(as_text=True)
@@ -91,8 +91,8 @@ BODY {
             "destination":"Udfd15a898e95c5a9525c1d6dfb1f1e40"}
 '''
 
-@handler.add(MessageEvent)
-def handle_message(event, destination):
+@handler.add(MessageEvent, postback=True)
+def handle_message(event):
     print('POSTBACK', postback.data)
     line_bot_api.reply_message(event.reply_token, 'yoyo!')
 
