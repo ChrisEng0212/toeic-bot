@@ -96,6 +96,8 @@ def handle_message(event, destination):
     print('RepTOK', event.reply_token)
     print('ID', event.source)  
     print(SourceUser) 
+    for m in SourceUser:
+        print(m)
     
     sticker_message = StickerSendMessage(
     package_id='1',
