@@ -85,17 +85,17 @@ BODY {
             "destination":"Udfd15a898e95c5a9525c1d6dfb1f1e40"}
 '''
 
-@handler.add(MessageEvent)
-def handle_message(event, destination):  
-    print('POSTBACK', event.postback.data)  
-
-
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):    
-    #message = TextSendMessage(text=event.message.text)   
+    #message = TextSendMessage(text=event.message.text)  
+    #text_message = TextSendMessage(text='Hello, world',
+    message=QuickReply(items=[
+        QuickReplyButton(action=MessageAction(label="label", text="text"))
+    ])) 
+    '''
     message = TemplateSendMessage(
-    alt_text='Buttons template', # shown on computer --> go to mobile for button view
+    alt_text='Buttons template', # shown on computer --> go to mobile for button view    
     template=ButtonsTemplate(
         thumbnail_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
         title='Menu',
@@ -117,6 +117,7 @@ def handle_message(event):
             ]
         )
     )
+    '''
     print('EVENT', event)    
     line_bot_api.reply_message(event.reply_token, message)
     
