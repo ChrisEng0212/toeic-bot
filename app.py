@@ -98,9 +98,9 @@ BODY {
             "destination":"Udfd15a898e95c5a9525c1d6dfb1f1e40"}
 '''
 
-@handler.add(MessageEvent)
+@handler.add(PosbackEvent))
 def handle_message(event):
-    print('POSTBACK', postback.data)
+    print('POSTBACK', event.postback.data)
     line_bot_api.reply_message(event.reply_token, 'yoyo!')
 
 
