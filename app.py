@@ -93,7 +93,13 @@ BODY {
 @handler.add(PostbackEvent)
 def handle_message(event, destination):
     print('POSTBACK', event.postback.data)
-    line_bot_api.reply_message(event.reply_token, 'yoyo!')
+    print('RepTOK', event.reply_token)
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text='yoyo!'))
+    sticker_message = StickerSendMessage(
+    package_id='1',
+    sticker_id='1'
+    )
+    line_bot_api.reply_message(event.reply_token, sticker_message)
 
 
 @handler.add(FollowEvent)
