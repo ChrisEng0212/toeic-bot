@@ -71,7 +71,23 @@ BODY {
             }
         ],
             "destination":"Udfd15a898e95c5a9525c1d6dfb1f1e40"}
+BODY {
+    "events":[
+        {
+            "type":"postback",
+            "replyToken":"8c03f680d3844588b212e5746c3e0aff",
+            "source":{"userId":"U2dc560609e55883a4d869c88c0d912e7","type":"user"},
+            "timestamp":1593444923886,
+            "mode":"active",
+            "postback":{"data":"action=buy&itemid=1"}
+            }
+        ],
+            "destination":"Udfd15a898e95c5a9525c1d6dfb1f1e40"}
 '''
+
+@handler.add(MessageEvent)
+def handle_message(event, destination):  
+    print('POSTBACK', event.postback.data)  
 
 
 
@@ -79,7 +95,7 @@ BODY {
 def handle_message(event):    
     #message = TextSendMessage(text=event.message.text)   
     message = TemplateSendMessage(
-    alt_text='Buttons template',
+    alt_text='Buttons template', # shown on computer --> go to mobile for button view
     template=ButtonsTemplate(
         thumbnail_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
         title='Menu',
@@ -87,7 +103,7 @@ def handle_message(event):
         actions=[
                 PostbackAction(
                     label='postback',
-                    display_text='postback text',
+                    display_text='postback text', # text displayed by user after button clicked
                     data='action=buy&itemid=1'
                 ),
                 MessageAction(
