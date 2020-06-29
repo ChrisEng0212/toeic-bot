@@ -46,7 +46,7 @@ def callback():
     event = body_json['events'][0]  
 
     if  event['type'] == 'postback':
-        line_bot_api.reply_message(event['reply_token'], 'yoyo!')
+        line_bot_api.reply_message(event['replyToken'], 'yoyo!')
         return 'ok'
 
     
