@@ -39,10 +39,10 @@ def callback():
     signature = request.headers['X-Line-Signature']
     print('SIGNATURE', signature)
 
-    body_data = request.get_data()
+    body_json = json.loads(request.get_data())
 
-    print(json.loads(body_data))
-        
+    print (body_json[events][0])
+    
     # get request body as text
     body = request.get_data(as_text=True)
     print('BODY', str(body))
