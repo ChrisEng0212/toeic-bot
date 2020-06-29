@@ -37,6 +37,10 @@ def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
     print('SIGNATURE', signature)
+
+    body_data = request.get_data()
+    print('TYPE', type(body_data))
+    print(body_data.events[0].type)
     # get request body as text
     body = request.get_data(as_text=True)
     print('BODY', str(body))
@@ -92,20 +96,14 @@ def handle_message(event, destination):
 
 
 @handler.add(FollowEvent)
-def handle_follow():
-    print('FOLLOW', postback.data)    
-    line_bot_api.reply_message(event.reply_token, 'yoyo!')
+def handle_follow():    
+    line_bot_api.reply_message(event.reply_token, 'welcome')
 
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):    
     #message = TextSendMessage(text=event.message.text)  
-    '''
-    message = TextSendMessage(text='Hello, world',
-                               quick_reply=QuickReply(items=[
-                                   QuickReplyButton(action=MessageAction(label="label", text="text"))
-                               ]))
-    '''
+    
     message = TemplateSendMessage(
     alt_text='Buttons template', # shown on computer --> go to mobile for button view    
     template=ButtonsTemplate(
