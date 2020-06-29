@@ -73,34 +73,10 @@ BODY {
             "destination":"Udfd15a898e95c5a9525c1d6dfb1f1e40"}
 '''
 
-buttons_template_message = TemplateSendMessage(
-    alt_text='Buttons template',
-    template=ButtonsTemplate(
-        thumbnail_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
-        title='Menu',
-        text='Please select',
-        actions=[
-            PostbackAction(
-                label='postback',
-                display_text='postback text',
-                data='action=buy&itemid=1'
-            ),
-            MessageAction(
-                label='message',
-                text='message text'
-            ),
-            URIAction(
-                label='uri',
-                uri='http://example.com/'
-            )
-        ]
-    )
-)
 
 
 @handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    print('HANDLE MESSAGE', message)
+def handle_message(event):    
     #message = TextSendMessage(text=event.message.text)   
     message = TemplateSendMessage(
     alt_text='Buttons template',
