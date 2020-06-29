@@ -89,10 +89,10 @@ BODY {
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):    
     #message = TextSendMessage(text=event.message.text)  
-    #text_message = TextSendMessage(text='Hello, world',
-    message=QuickReply(items=[
-        QuickReplyButton(action=MessageAction(label="label", text="text"))
-    ])) 
+    message = TextSendMessage(text='Hello, world',
+                               quick_reply=QuickReply(items=[
+                                   QuickReplyButton(action=MessageAction(label="label", text="text"))
+                               ]))
     '''
     message = TemplateSendMessage(
     alt_text='Buttons template', # shown on computer --> go to mobile for button view    
