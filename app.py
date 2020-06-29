@@ -22,7 +22,8 @@ def hello_world():
 @app.route('/text/<string:tx>')
 def text(tx):
     try:
-        line_bot_api.push_message('U2dc560609e55883a4d869c88c0d912e7', TextSendMessage(text=tx))
+        line_bot_api.multicast(['U2dc560609e55883a4d869c88c0d912e7'], TextSendMessage(text=tx))
+        # max 150 recipients
     except LineBotApiError as e:
         abort(400)
     return tx
@@ -58,15 +59,76 @@ event {"message": {
       "timestamp": 1593265283364, 
       "type": "message"
     }
+BODY {
+    "events":[
+        {
+            "type":"message",
+            "replyToken":"e6e23f53403b446c98d08d7972683c9a",
+            "source":{"userId":"U2dc560609e55883a4dc560609e55883a4d869c88c0d912e7","type":"user"},
+            "timestamp":1593266202427,
+            "mode":"active",
+            "message":{"type":"text","id":"12219700373697","text":"okayon":"Udfd15a8989"}
+            }
+        ],
+            "destination":"Udfd15a898e95c5a9525c1d6dfb1f1e40"}
 '''
 
-# 處理訊息
+buttons_template_message = TemplateSendMessage(
+    alt_text='Buttons template',
+    template=ButtonsTemplate(
+        thumbnail_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+        title='Menu',
+        text='Please select',
+        actions=[
+            PostbackAction(
+                label='postback',
+                display_text='postback text',
+                data='action=buy&itemid=1'
+            ),
+            MessageAction(
+                label='message',
+                text='message text'
+            ),
+            URIAction(
+                label='uri',
+                uri='http://example.com/'
+            )
+        ]
+    )
+)
+
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    message = TextSendMessage(text=event.message.text)
+    print('HANDLE MESSAGE', message)
+    #message = TextSendMessage(text=event.message.text)   
+    message = TemplateSendMessage(
+    alt_text='Buttons template',
+    template=ButtonsTemplate(
+        thumbnail_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+        title='Menu',
+        text='Please select',
+        actions=[
+                PostbackAction(
+                    label='postback',
+                    display_text='postback text',
+                    data='action=buy&itemid=1'
+                ),
+                MessageAction(
+                    label='message',
+                    text='message text'
+                ),
+                URIAction(
+                    label='uri',
+                    uri='http://example.com/'
+                )
+            ]
+        )
+    )
     print('EVENT', event)    
     line_bot_api.reply_message(event.reply_token, message)
     
-import os
+
+
 if __name__ == '__main__': 
     app.run(debug=True)
