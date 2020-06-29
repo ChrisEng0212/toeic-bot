@@ -95,7 +95,7 @@ def handle_message(event, destination):
     print('POSTBACK', event.postback.data)
     print('RepTOK', event.reply_token)
     print('ID', event.source)  
-    print(SourceUser.user_id) 
+    print(SourceUser) 
     
     sticker_message = StickerSendMessage(
     package_id='1',
