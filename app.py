@@ -41,7 +41,12 @@ def callback():
 
     body_json = json.loads(request.get_data())
 
-    print (body_json['events'][0])    
+    print (body_json['events'][0]['type'])    
+
+    if body_json['events'][0]['type'] == 'postback':
+        line_bot_api.reply_message(event.reply_token, 'yoyo!')
+        return 'ok'
+
     
     # get request body as text
     body = request.get_data(as_text=True)
@@ -51,7 +56,7 @@ def callback():
     try:
         print('HANDLER try')
         handler.handle(body, signature)
-        print('HANDLER success')
+        print('HANDLER success')    
     except InvalidSignatureError:
         abort(400)
     return 'OK'
