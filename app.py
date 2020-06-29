@@ -91,7 +91,7 @@ BODY {
 '''
 
 @handler.add(PostbackEvent)
-def handle_message(event):
+def handle_message(event, destination):
     print('POSTBACK', event.postback.data)
     line_bot_api.reply_message(event.reply_token, 'yoyo!')
 
