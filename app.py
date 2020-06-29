@@ -41,15 +41,7 @@ def callback():
 
     body_json = json.loads(request.get_data())
 
-    print (body_json['events'][0]['type']) 
-
-    event = body_json['events'][0]  
-
-    if  event['type'] == 'postback':
-        line_bot_api.reply_message(event['replyToken'], 'yoyo!')
-        return 'ok'
-
-    
+        
     # get request body as text
     body = request.get_data(as_text=True)
     print('BODY', str(body))
