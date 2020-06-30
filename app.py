@@ -178,7 +178,7 @@ def message_list(arg, info):
                 actions=[
                     PostbackAction(
                         label='My name is ' + info,
-                        display_text='It would be great to know which high school you attend?',
+                        display_text='Please tell us which high school you attend?',
                         data="['Name', '" + info + "']"
                     ),
                     PostbackAction(
@@ -203,7 +203,7 @@ def message_list(arg, info):
                 text='Please check',
                 actions=[
                     PostbackAction(
-                        label='Highschool: ' + info,
+                        label='School: ' + info,
                         display_text='Could we have your phone number for contacting?',
                         data="['High', '" + info + "']"
                     ),
@@ -360,7 +360,7 @@ def handle_message(event):
     elif recruit.number == None:
         if len(tx) < 12: 
             number = event.message.text
-            message = message_list('num', num)
+            message = message_list('num', number)
         else:
             message = message_list('alert', name)
     else:
