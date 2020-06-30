@@ -165,7 +165,7 @@ def message_list(arg, info):
         message = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
-                thumbnail_image_url='sunrise.jpg',
+                thumbnail_image_url= url_for('static', filename='sunrise.jpg')
                 title='Menu',
                 text='Please select',
                 actions=[
@@ -177,11 +177,7 @@ def message_list(arg, info):
                     MessageAction(
                         label='message',
                         text='message text'
-                    ),
-                    URIAction(
-                        label='uri',
-                        uri='http://example.com/'
-                    )
+                    )                    
                 ]
             )
         )
