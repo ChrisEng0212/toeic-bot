@@ -171,10 +171,10 @@ def message_list(arg, info):
                 text='Please select',
                 actions=[
                     PostbackAction(
-                        label='AFLD English Division',
+                        label='English Division',
                         display_text='Got it. Please write your name first',
                         data="['Division', 'Eng']"
-                    )
+                    ),
                 ]
             )
         )
