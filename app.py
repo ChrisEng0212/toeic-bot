@@ -222,7 +222,7 @@ def callback():
     try:
         events = parser.parse(body, signature) 
         newUser = events[0].source.user_id  
-        recruit = User.query.filter_by(line=newUser).first()     
+        recruit = Recruits.query.filter_by(line=newUser).first()     
     except InvalidSignatureError:
         abort(400)
 
@@ -241,7 +241,7 @@ def callback():
         return 'OK'     
     if events[0].type == 'unfollow':
         print('ID unfollow', newUser)
-        recruit = User.query.filter_by(line=newUser).first()
+        recruit = Recruits.query.filter_by(line=newUser).first()
         recruit.status = 'left'
         db.session.commit()
 
@@ -260,7 +260,7 @@ def callback():
 def handle_message(event):    
     #message = TextSendMessage(text=event.message.text)  
     userID = event.source.user_id
-    recruit = User.query.filter_by(line=userID).first()
+    recruit = Recruits.query.filter_by(line=userID).first()
 
     if recruit.name == None:
         name = event.message.text
@@ -290,7 +290,7 @@ def handle_message(event, destination):
         return None
     else:
         userID = event.source.user_id
-        recruit = User.query.filter_by(line=userID).first() 
+        recruit = Recruits.query.filter_by(line=userID).first() 
     
     if recruit.name == None:
         recruit.name = data   
