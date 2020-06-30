@@ -100,7 +100,8 @@ def handle_message(event, destination):
     print(SourceUser) 
     @abc.abstractmethod
     def abstractMethod(SourceUser):
-        pass
+        print(SourceUser)
+        
     
     sticker_message = StickerSendMessage(
     package_id='1',
