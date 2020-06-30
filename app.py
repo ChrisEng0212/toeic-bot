@@ -162,6 +162,31 @@ def message_list(arg, info):
 
 
     if arg == 'high': 
+        message = TemplateSendMessage(
+            alt_text='Buttons template',
+            template=ButtonsTemplate(
+                thumbnail_image_url='sunrise.jpg',
+                title='Menu',
+                text='Please select',
+                actions=[
+                    PostbackAction(
+                        label='postback',
+                        display_text='postback text',
+                        data='action=buy&itemid=1'
+                    ),
+                    MessageAction(
+                        label='message',
+                        text='message text'
+                    ),
+                    URIAction(
+                        label='uri',
+                        uri='http://example.com/'
+                    )
+                ]
+            )
+        )
+        return message
+        '''
         message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
         thumbnail_image_url='sunrise.jpg',
         title='HighSchool',
@@ -181,7 +206,7 @@ def message_list(arg, info):
             )
         )
         return message
-
+    '''
     if arg == 'num': 
         message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
         thumbnail_image_url='sunrise.jpg',
