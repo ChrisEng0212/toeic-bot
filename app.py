@@ -65,18 +65,27 @@ class Students(db.Model):
     questions = db.Column(db.String)
     status = db.Column(db.String)
 
+class Recruits(db.Model):
+    id = db.Column(db.Integer, primary_key=True) 
+    line = db.Column(db.String)
+    name = db.Column(db.String)
+    highschool = db.Column(db.String)
+    number = db.Column(db.String)
+    dept = db.Column(db.String)
+    questions = db.Column(db.String)
+    status = db.Column(db.String)
+
 class MyModelView(ModelView):
     def is_accessible(self):
         if DEBUG == True:
             return True
         else:
             return True
-        
- 
-admin = Admin(app)
 
+admin = Admin(app)
 admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView(Students, db.session))
+admin.add_view(MyModelView(Recruits, db.session))
     
 
 @app.route("/login/<string:pw>", methods=['GET','POST'])
@@ -129,17 +138,18 @@ def callback():
     body = request.get_data(as_text=True)
     print('BODY', str(body))
     app.logger.info("Request body: " + body)
-    
+
     # parse webhook body
+
     try:
-        events = parser.parse(body, signature)
-        print('event PARSE', events)
-        print('event PARSE', type(events))        
-        print('event STRING', str(events))
-        print('event INDEX', events[0])
-        print('event TYPE', events[0].type)
+        events = parser.parse(body, signature)        
     except InvalidSignatureError:
         abort(400)
+
+    if events[0].type == 'follow':
+        print('ID follow', events[0].source.user_id)
+    if events[0].type == 'unfollow':
+        print('ID unfollow', events[0].source.user_id)
 
     # handle webhook body
     try:
