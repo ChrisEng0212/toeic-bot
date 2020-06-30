@@ -299,8 +299,7 @@ def rich_menu():
 
 
 @app.route("/callback", methods=['POST'])
-def callback():
-    rich_menu()
+def callback():    
     print('CALLBACK')
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
