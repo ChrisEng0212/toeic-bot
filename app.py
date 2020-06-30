@@ -136,12 +136,13 @@ def message_list(arg, info):
         message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')        
         message2 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')    
         print('WELCOME MESSAGE')
+        '''
         message3 = TemplateSendMessage(
             alt_text='Which department?',
             template=ButtonsTemplate(
                 thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
                 title='Which department are you interested in?',
-                text='We have an ENglish and Japanese department and many other departments at JinWen university',
+                text='We have an English and Japanese department and many other departments at JinWen university',
                 actions=[
                     PostbackAction(
                         label='AFLD English Division',
@@ -160,8 +161,9 @@ def message_list(arg, info):
                     )              
                 ]
             )
-        )  
-        return [image, message1, message2, message3]
+        ) 
+        ''' 
+        return [image, message1, message2]
     
     if arg == 'name':
         print('NAME MESSAGE')
