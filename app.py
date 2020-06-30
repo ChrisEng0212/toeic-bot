@@ -158,14 +158,12 @@ def message_list(arg, info):
         return message
         
     
-    
-
-
     if arg == 'high': 
+        print('HIGH MESSAGE')
         message = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
-                thumbnail_image_url= 'https://tnimage.s3.hicloud.net.tw/photos/shares/5a3cd59f1b161.JPG',
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
                 title='Menu',
                 text='Please select',
                 actions=[
@@ -177,10 +175,15 @@ def message_list(arg, info):
                     MessageAction(
                         label='message',
                         text='message text'
-                    )                    
+                    ),
+                    URIAction(
+                        label='uri',
+                        uri='http://example.com/'
+                    )                   
                 ]
             )
         )
+        print('MESSAGE', message)
         return message
         '''
         message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
