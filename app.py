@@ -6,6 +6,7 @@ from flask_admin.contrib.sqla import ModelView
 from datetime import datetime, timedelta
 import json
 import os
+import ast 
 
 try:
     from meta import SQLALCHEMY_DATABASE_URI, SECRET_KEY, DEBUG, channel_access_token, channel_secret
@@ -127,33 +128,63 @@ def text(tx):
 def message_list(arg, info):
 
     if arg == "welcome":
-        sticker = StickerSendMessage(package_id='2', sticker_id='144')  
-        message1 = TextSendMessage(text='Welcome to Jin Wen Applied Foreign Languages Department!')
-        message2 = TextSendMessage(text='This bot is here to help with any question you have about the Department or our application process')
-        message3 = TextSendMessage(text='First please provide some basic details so we can help you.')
-        message4 = TextSendMessage(text='1. What is your name?')
-        return [sticker, message1, message2, message3, message4]
+        image = ImageSendMessage(
+            original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG',
+            preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG'
+        )
+        #sticker = StickerSendMessage(package_id='2', sticker_id='144')  
+        message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')        
+        message2 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')    
+        print('WELCOME MESSAGE')
+        message3 = TemplateSendMessage(
+            alt_text='Which department?',
+            template=ButtonsTemplate(
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                title='Which department are you interested in?',
+                text='We have an ENglish and Japanese department and many other departments at JinWen university',
+                actions=[
+                    PostbackAction(
+                        label='AFLD English Division',
+                        display_text='Got it. Please write your name first',
+                        data="['Division', 'Eng']"
+                    ),
+                    PostbackAction(
+                        label= 'AFLD Japanese Division',
+                        display_text='Got it. Please write your name first',
+                        data="['Division', 'Jpn']"
+                    ),              
+                    PostbackAction(
+                        label= 'Another department',
+                        display_text='Got it. Please write your name first',
+                        data="['Division', 'Other']"
+                    )              
+                ]
+            )
+        )  
+        return [image, message1, message2, message3]
     
     if arg == 'name':
         print('NAME MESSAGE')
         message = TemplateSendMessage(
-            alt_text='Confirm',
-            template=ConfirmTemplate(
-                text='Please check',
-                    actions=[
-                        PostbackAction(
-                            label='Name: ' + info,
-                            display_text='Thank you.  2) It would be great to know your high school?',
-                            data=info
-                        ),
-                        PostbackAction(
-                            label='My name is ' + info,
-                            display_text='Thank you.  2) It would be great to know your high school?',
-                            data=info
-                        ),
-                    ]
-                )
+            alt_text='Your name',
+            template=ButtonsTemplate(
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                title='Please check your name.',
+                text='You can write it again if you need to.',
+                actions=[
+                    PostbackAction(
+                        label='My name is ' + info,
+                        display_text='Next question',
+                        data="['Name', '" + info + "']"
+                    ),
+                    PostbackAction(
+                        label= 'write again',
+                        display_text='No problem, try again. 1) What is your name?',
+                        data='None'
+                    )              
+                ]
             )
+        )
         print('MESSAGE', message)
         return message
         
@@ -164,13 +195,13 @@ def message_list(arg, info):
             alt_text='Buttons template',
             template=ButtonsTemplate(
                 thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
-                title='Menu',
-                text='Please select',
+                title='This is your highschool',
+                text='Please check',
                 actions=[
                     PostbackAction(
-                        label='My highschool is ',
-                        display_text='Next question',
-                        data='info'
+                        label='My highschool is ' + info,
+                        display_text='Could we have your number for contacting?',
+                        data="['High', '" + info + "']"
                     ),
                     PostbackAction(
                         label= 'write again',
@@ -182,27 +213,7 @@ def message_list(arg, info):
         )
         print('MESSAGE', message)
         return message
-        '''
-        message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
-        thumbnail_image_url='sunrise.jpg',
-        title='HighSchool',
-        text='Please select',
-        actions=[
-                    PostbackAction(
-                        label='My highschool is ' + info,
-                        display_text='Great we got it. 3) Could you provide your phone number?', 
-                        data=info
-                    ),
-                    PostbackAction(
-                        label='This is not correct',
-                        display_text="Sorry, let's try again. 1. What is your highschool?'", 
-                        data='None'
-                    )                
-                ]
-            )
-        )
-        return message
-    '''
+        
     if arg == 'num': 
         message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
         thumbnail_image_url='sunrise.jpg',
@@ -289,18 +300,19 @@ def handle_message(event):
 
     if recruit.name == None:
         name = event.message.text
-        message = message_list('name', name)
+        message = message_list('name', name) # get template to check 
     elif recruit.highschool == None:
         high = event.message.text
         message = message_list('high', high)
     elif recruit.number == None:
         number = event.message.text
         message = message_list('num', num)
-
     
     
     print('EVENT', event)    
     line_bot_api.reply_message(event.reply_token, message)
+
+
 
 @handler.add(PostbackEvent)
 def handle_message(event, destination):
@@ -316,23 +328,20 @@ def handle_message(event, destination):
     else:
         userID = event.source.user_id
         recruit = Recruits.query.filter_by(line=userID).first() 
+
     
-    if recruit.name == None:
-        recruit.name = data   
-        message = message_list('high', data)     
-    elif recruit.highschool == None:
-        recruit.highschool = data 
-        message = message_list('num', data)     
-    elif recruit.phonenumber == None:
-        recruit.phonenumber = data
-        message = message_list('dept', data)     
-    elif recruit.dept == None:
-        recruit.dept = data     
-    
-    db.session.commit()    
-    
-    line_bot_api.reply_message(event.reply_token, message)
-    
+    data_list = ast.literal_eval(event.postback.data)
+    if data_list[0] == 'Division':
+        recruit.dept = data_list[1]
+    if data_list[0] == 'Name':
+        recruit.name = data_list[1]
+    if data_list[0] == 'High':
+        recruit.high = data_list[1]
+    if data_list[0] == 'Num':
+        recruit.number = data_list[1]
+
+    db.session.commit()     
+
     #profile = line_bot_api.get_profile(user_id)
     #print(profile)
 
