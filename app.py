@@ -46,6 +46,10 @@ handler = WebhookHandler(channel_secret)
 parser = WebhookParser(channel_secret)
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    return None
+
 class User(db.Model, UserMixin): 
     id = db.Column(db.Integer, primary_key=True) 
     username =  db.Column(db.String(20), unique=True, nullable=False)    
@@ -59,15 +63,35 @@ class Students(db.Model):
     number = db.Column(db.String)
     dept = db.Column(db.String)
     questions = db.Column(db.String)
+
+class MyModelView(ModelView):
+    def is_accessible(self):
+        if DEBUG == True:
+            return True
+        else:
+            return True
+        
+ 
+admin = Admin(app)
+
+admin.add_view(MyModelView(User, db.session))
+admin.add_view(MyModelView(Students, db.session))
     
 
 @app.route("/login/<string:pw>", methods=['GET','POST'])
 def login(pw):
+    print('LOGIN')
+
     if pw == 'pw':
         user = User.query.filter_by(username='Admin').first()
-        login_user (user)
-        flash (f'Debug Login', 'warning') 
-        redirect (url_for('data'))   
+        print(user.username)
+        login_user(user)
+        print(user, 'loggedin')
+        return redirect (url_for('data')) 
+    else:
+        return 'Cannot login'
+
+    
   
 
 @app.route('/')
