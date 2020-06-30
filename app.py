@@ -128,7 +128,6 @@ def text(tx):
 def message_list(arg, info):
 
     if arg == "welcome":
-        '''
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG'
@@ -137,20 +136,21 @@ def message_list(arg, info):
         message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')        
         message2 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')    
         print('WELCOME MESSAGE')
+        
         message3 = TemplateSendMessage(
             alt_text='Which department?',
             template=ButtonsTemplate(
                 thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
-                title='Which department?', #are you interested in?',
-                text='We have an English and Japanese', # department and many other departments at JinWen university',
+                title='Which department are you interested in?',
+                text='We have an English and Japanese department and many other departments at JinWen university',
                 actions=[
                     PostbackAction(
-                        label='AFLD English Division',
+                        label='English Division',
                         display_text='Got it. Please write your name first',
                         data="['Division', 'Eng']"
                     ),
                     PostbackAction(
-                        label= 'AFLD Japanese Division',
+                        label= 'Japanese Division',
                         display_text='Got it. Please write your name first',
                         data="['Division', 'Jpn']"
                     ),              
@@ -161,25 +161,8 @@ def message_list(arg, info):
                     )              
                 ]
             )
-        ) 
-        '''
-        message3 = TemplateSendMessage(
-            alt_text='Buttons template',
-            template=ButtonsTemplate(
-                thumbnail_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
-                title='Menu',
-                text='Please select',
-                actions=[
-                    PostbackAction(
-                        label='English Division',
-                        display_text='Got it. Please write your name first',
-                        data="['Division', 'Eng']"
-                    ),
-                ]
-            )
-        )
-        
-        return message3
+        )  
+        return [image, message1, message2, message3]
     
     if arg == 'name':
         print('NAME MESSAGE')
@@ -217,8 +200,8 @@ def message_list(arg, info):
                 text='Please check',
                 actions=[
                     PostbackAction(
-                        label='My highschool is ' + info,
-                        display_text='Could we have your number for contacting?',
+                        label='Highschool: ' + info,
+                        display_text='Could we have your phone number for contacting?',
                         data="['High', '" + info + "']"
                     ),
                     PostbackAction(
