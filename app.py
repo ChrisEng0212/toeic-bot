@@ -128,6 +128,7 @@ def text(tx):
 def message_list(arg, info):
 
     if arg == "welcome":
+        '''
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG'
@@ -162,8 +163,8 @@ def message_list(arg, info):
                 ]
             )
         ) 
-        ''' 
-        return [image, message1, message2]
+        
+        return message3
     
     if arg == 'name':
         print('NAME MESSAGE')
