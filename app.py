@@ -41,13 +41,20 @@ def callback():
     signature = request.headers['X-Line-Signature']
     print('SIGNATURE', signature)
 
-    body_json = json.loads(request.get_data())
-
-        
+            
     # get request body as text
     body = request.get_data(as_text=True)
     print('BODY', str(body))
     app.logger.info("Request body: " + body)
+
+    # parse webhook body
+    try:
+        events = parser.parse(body, signature)
+        print('event PARSE')
+    except InvalidSignatureError:
+        abort(400)
+
+
     # handle webhook body
     try:
         print('HANDLER try')
@@ -65,8 +72,7 @@ def handle_message(event, destination):
     print(type(event.source)) 
     print(SourceUser) 
     print(SourceUser())
-    for m in SourceUser():
-        print (m)
+    
     
 
     
