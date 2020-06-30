@@ -165,7 +165,7 @@ def message_list(arg, info):
         message = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
-                thumbnail_image_url= url_for('static', filename='sunrise.jpg')
+                thumbnail_image_url= url_for('static', filename='sunrise.jpg'),
                 title='Menu',
                 text='Please select',
                 actions=[
