@@ -57,51 +57,14 @@ def callback():
         abort(400)
     return 'OK'
 
-'''
-event {"message": {
-    "id": "100001",
-     "text": "Hello, world", "type": "text"},
-      "replyToken": "00000000000000000000000000000000",
-      "source": {"type": "user", "userId": "Udeadbeefdeadbeefdeadbeefdeadbeef"}, 
-      "timestamp": 1593265283364, 
-      "type": "message"
-    }
-BODY {
-    "events":[
-        {
-            "type":"message",
-            "replyToken":"e6e23f53403b446c98d08d7972683c9a",
-            "source":{"userId":"U2dc560609e55883a4dc560609e55883a4d869c88c0d912e7","type":"user"},
-            "timestamp":1593266202427,
-            "mode":"active",
-            "message":{"type":"text","id":"12219700373697","text":"okayon":"Udfd15a8989"}
-            }
-        ],
-            "destination":"Udfd15a898e95c5a9525c1d6dfb1f1e40"}
-BODY {
-    "events":[
-        {
-            "type":"postback",
-            "replyToken":"8c03f680d3844588b212e5746c3e0aff",
-            "source":{"userId":"U2dc560609e55883a4d869c88c0d912e7","type":"user"},
-            "timestamp":1593444923886,
-            "mode":"active",
-            "postback":{"data":"action=buy&itemid=1"}
-            }
-        ],
-            "destination":"Udfd15a898e95c5a9525c1d6dfb1f1e40"}
-'''
-
 @handler.add(PostbackEvent)
 def handle_message(event, destination):
     print('POSTBACK', event.postback.data)
     print('RepTOK', event.reply_token)
     print('ID', event.source)  
-    print(SourceUser) 
-    @abc.abstractmethod
-    def abstractMethod(SourceUser):
-        print(SourceUser)
-        
+    print(SourceUser()) 
+    
+
     
     sticker_message = StickerSendMessage(
     package_id='1',
@@ -161,3 +124,4 @@ def handle_message(event):
 
 if __name__ == '__main__': 
     app.run(debug=True)
+
