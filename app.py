@@ -142,14 +142,15 @@ def message_list(arg, info):
                 text='Please check',
                     actions=[
                         PostbackAction(
+                            label='Name: ' + info,
+                            display_text='Thank you.  2) It would be great to know your high school?',
+                            data=info
+                        ),
+                        PostbackAction(
                             label='My name is ' + info,
                             display_text='Thank you.  2) It would be great to know your high school?',
                             data=info
                         ),
-                        MessageAction(
-                            label='This is not correct',
-                            text="Sorry, let's try again. 1. What is your name?'"
-                        )
                     ]
                 )
             )
