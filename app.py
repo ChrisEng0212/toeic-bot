@@ -135,23 +135,25 @@ def message_list(arg, info):
         return [sticker, message1, message2, message3, message4]
     
     if arg == 'name':
+        print('NAME MESSAGE')
         message = TemplateSendMessage(
             alt_text='Confirm',
             template=ConfirmTemplate(
                 text='Please check',
                     actions=[
                         PostbackAction(
-                            label='My name is ' + info,
+                            label='My name is ',
                             display_text='Thank you.  2) It would be great to know your high school?',
-                            data=info
+                            data='info'
                         ),
                         MessageAction(
                             label='This is not correct',
-                            display_text="Sorry, let's try again. 1. What is your name?'"
+                            text="Sorry, let's try again. 1. What is your name?'"
                         )
                     ]
                 )
             )
+        print('MESSAGE', message)
         return message
         
     
