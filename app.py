@@ -62,14 +62,14 @@ class Students(db.Model):
     highschool = db.Column(db.String)
     number = db.Column(db.String)
     dept = db.Column(db.String)
-    questions = db.Column(db.String)
-    status = db.Column(db.String)
+    questions = db.Column(db.String)    
 
 class Recruits(db.Model):
     id = db.Column(db.Integer, primary_key=True) 
     line = db.Column(db.String)
     name = db.Column(db.String)
     highschool = db.Column(db.String)
+    ## how did you hear about us?
     number = db.Column(db.String)
     dept = db.Column(db.String)
     questions = db.Column(db.String)
@@ -126,6 +126,85 @@ def text(tx):
     return tx
 
 
+def message_list(arg, info):
+
+    if arg == "welcome":
+        sticker = StickerSendMessage(package_id='2', sticker_id='144')  
+        message1 = TextSendMessage(text='Welcome to Jin Wen Applied Foreign Languages Department!')
+        message2 = TextSendMessage(text='This bot is here to help with any question you have about the Department or our application process')
+        message3 = TextSendMessage(text='First please provide some basic details so we can help you.')
+        message4 = TextSendMessage(text='1. What is your name?')
+        return [sticker, message1, message2, message3, message4]
+    
+    if arg == 'name':
+        message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
+        thumbnail_image_url='sunrise.jpg',
+        title='Name',
+        text='Please select',
+        actions=[
+                    PostbackAction(
+                        label='My name is ' + info,
+                        display_text='Thank you.  2) What is your high school?', 
+                        data=info
+                    ),
+                    PostbackAction(
+                        label='This is not correct',
+                        display_text="Sorry, let's try again. 1. What is your name?'", 
+                        data='None'
+                    )                
+                ]
+            )
+        )
+        return message
+    
+    if arg == 'high': 
+        message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
+        thumbnail_image_url='sunrise.jpg',
+        title='HighSchool',
+        text='Please select',
+        actions=[
+                    PostbackAction(
+                        label='My highschool is ' + info,
+                        display_text='Great we got it. 3) Could you provide your phone number?', 
+                        data=info
+                    ),
+                    PostbackAction(
+                        label='This is not correct',
+                        display_text="Sorry, let's try again. 1. What is your highschool?'", 
+                        data='None'
+                    )                
+                ]
+            )
+        )
+        return message
+
+    if arg == 'num': 
+        message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
+        thumbnail_image_url='sunrise.jpg',
+        title='HighSchool',
+        text='Please select',
+        actions=[
+                    PostbackAction(
+                        label='My number is ' + info,
+                        display_text='Thanks, now about our department....', 
+                        data=info
+                    ),
+                    PostbackAction(
+                        label='This is not correct',
+                        display_text="Sorry, let's try again. 3. What is your number?'", 
+                        data='None'
+                    ),               
+                    PostbackAction(
+                        label="I prefer not to write my number",
+                        display_text="Okay, no problem, our line BOT is a fine way to get in touch. So about our department...'", 
+                        data='None'
+                    )                
+                ]
+            )
+        )
+        return message
+
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -140,17 +219,33 @@ def callback():
     app.logger.info("Request body: " + body)
 
     # parse webhook body
-
     try:
-        events = parser.parse(body, signature)        
+        events = parser.parse(body, signature) 
+        newUser = events[0].source.user_id  
+        recruit = User.query.filter_by(line=newUser).first()     
     except InvalidSignatureError:
         abort(400)
 
-    if events[0].type == 'follow':
-        print('ID follow', events[0].source.user_id)
-    if events[0].type == 'unfollow':
-        print('ID unfollow', events[0].source.user_id)
+    if events[0].type == 'follow':        
+        print('ID follow', newUser )        
+        if recruit:
+            if recruit.status == 'left':
+                recruit.status = 'follow'
+                db.session.commit()        
+        else:            
+            newRec(line=newUser, status='follow')
+            db.session.add(newRec)
+            db.session.commit()
 
+        line_bot_api.push_message(newUser, message_list('welcome', None))
+        return 'OK'     
+    if events[0].type == 'unfollow':
+        print('ID unfollow', newUser)
+        recruit = User.query.filter_by(line=newUser).first()
+        recruit.status = 'left'
+        db.session.commit()
+
+    
     # handle webhook body
     try:
         print('HANDLER try')
@@ -161,69 +256,78 @@ def callback():
     return 'OK'
 
 
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):    
+    #message = TextSendMessage(text=event.message.text)  
+    userID = event.source.user_id
+    recruit = User.query.filter_by(line=userID).first()
+
+    if recruit.name == None:
+        name = event.message.text
+        message = message_list('name', name)
+    elif recruit.highschool == None:
+        high = event.message.text
+        message = message_list('high', high)
+    elif recruit.number == None:
+        number = event.message.text
+        message = message_list('num', num)
+
+    
+    
+    print('EVENT', event)    
+    line_bot_api.reply_message(event.reply_token, message)
+
 @handler.add(PostbackEvent)
 def handle_message(event, destination):
-    print('POSTBACK', event.postback.data)   
-    
     if isinstance(event.source, SourceUser):
         print('ID', event.source.user_id) # user_id replaces userId
     
-    sticker_message = StickerSendMessage(
-    package_id='1',
-    sticker_id='1'
-    )    
-    line_bot_api.reply_message(event.reply_token, [TextSendMessage(text='yoyo!'), sticker_message])
+    print('POSTBACK', event.postback.data)   
+    data = event.postback.data
+
+    if data == 'None':
+        pass
+        return None
+    else:
+        userID = event.source.user_id
+        recruit = User.query.filter_by(line=userID).first() 
+    
+    if recruit.name == None:
+        recruit.name = data   
+        message = message_list('high', data)     
+    elif recruit.highschool == None:
+        recruit.highschool = data 
+        message = message_list('num', data)     
+    elif recruit.phonenumber == None:
+        recruit.phonenumber = data
+        message = message_list('dept', data)     
+    elif recruit.dept == None:
+        recruit.dept = data     
+    
+    db.session.commit()    
+    
+    line_bot_api.reply_message(event.reply_token, message)
     
     #profile = line_bot_api.get_profile(user_id)
     #print(profile)
 
 
-@handler.add(FollowEvent)
-def handle_follow():  
-    print()
+    
 
+@handler.add(FollowEvent)
+def handle_follow():
+    print('student has joined')
 
 @handler.add(UnfollowEvent)
-def handle_follow():        
+def handle_unfollow():        
     print('student has left')
-
 
 #If there is no handler for an event, this default handler method is called.
 @handler.default()
 def default(event):
     print('DEFAULT', event)
 
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):    
-    #message = TextSendMessage(text=event.message.text)  
-    
-    message = TemplateSendMessage(
-    alt_text='Buttons template', # shown on computer --> go to mobile for button view    
-    template=ButtonsTemplate(
-        thumbnail_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
-        title='Menu',
-        text='Please select',
-        actions=[
-                PostbackAction(
-                    label='postback',
-                    display_text='postback text', # text displayed by user after button clicked
-                    data='action=buy&itemid=1'
-                ),
-                MessageAction(
-                    label='message',
-                    text='message text'
-                ),
-                URIAction(
-                    label='uri',
-                    uri='http://example.com/'
-                )
-            ]
-        )
-    )
-    
-    print('EVENT', event)    
-    line_bot_api.reply_message(event.reply_token, message)
-    
+
 
 
 if __name__ == '__main__': 
