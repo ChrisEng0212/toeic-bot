@@ -322,6 +322,7 @@ def callback():
         print('ID unfollow', newUser)
         recruit = Recruits.query.filter_by(line=newUser).first()
         recruit.status = 'left'
+        recruit.line = '0000' + recruit.line
         db.session.commit()
 
     
@@ -346,19 +347,19 @@ def handle_message(event):
     tx = event.message.text
 
     if recruit.name == None:
-        if len(tx) < 10:            
+        if len(tx) < 11:            
             name = event.message.text
             message = message_list('name', name) # get template to check 
         else:
             message = message_list('alert', None)
     elif recruit.highschool == None:
-        if len(tx) < 10: 
+        if len(tx) < 11: 
             high = event.message.text
             message = message_list('high', high)
         else:
             message = message_list('alert', None)
     elif recruit.number == None:
-        if len(tx) < 12: 
+        if len(tx) < 11: 
             number = event.message.text
             message = message_list('num', number)
         else:
