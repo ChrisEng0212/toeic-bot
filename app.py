@@ -127,6 +127,10 @@ def text(tx):
 
 def message_list(arg, info):
 
+    if arg == 'alert': 
+        message = TextSendMessage(text='Sorry this answer is too long, please make it shorter (<10)') 
+        return message
+
     if arg == "welcome":
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG',
@@ -224,7 +228,7 @@ def message_list(arg, info):
                 text='Please check',
                 actions=[
                         PostbackAction(
-                            label='My number is ' + info,
+                            label='Phone: ' + info,
                             display_text='Thanks, now the BOT can help with some questions you may have', 
                             data="['Num', '" + info + "']"
                         ),
@@ -273,6 +277,10 @@ def message_list(arg, info):
                 )
             )
         return message
+    
+    
+
+    
     
 
 
@@ -327,21 +335,34 @@ def callback():
     return 'OK'
 
 
+
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):    
     #message = TextSendMessage(text=event.message.text)  
     userID = event.source.user_id
     recruit = Recruits.query.filter_by(line=userID).first()
 
+    tx = event.message.text
+
     if recruit.name == None:
-        name = event.message.text
-        message = message_list('name', name) # get template to check 
+        if len(tx) < 10:            
+            name = event.message.text
+            message = message_list('name', name) # get template to check 
+        else:
+            message = message_list('alert', name)
     elif recruit.highschool == None:
-        high = event.message.text
-        message = message_list('high', high)
+        if len(tx) < 10: 
+            high = event.message.text
+            message = message_list('high', high)
+        else:
+            message = message_list('alert', name)
     elif recruit.number == None:
-        number = event.message.text
-        message = message_list('num', num)
+        if len(tx) < 12: 
+            number = event.message.text
+            message = message_list('num', num)
+        else:
+            message = message_list('alert', name)
     else:
         message = message_list('gen', None)
     
@@ -374,7 +395,7 @@ def handle_message(event, destination):
     if data_list[0] == 'Name':
         recruit.name = data_list[1]
     if data_list[0] == 'High':
-        recruit.high = data_list[1]
+        recruit.highschool = data_list[1]
     if data_list[0] == 'Num':
         recruit.number = data_list[1]
 
