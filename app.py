@@ -132,17 +132,16 @@ def message_list(arg, info):
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG'
         )
-        #sticker = StickerSendMessage(package_id='2', sticker_id='144')  
+        sticker = StickerSendMessage(package_id='2', sticker_id='144')  
         message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')        
         message2 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')    
         print('WELCOME MESSAGE')
-        
         message3 = TemplateSendMessage(
             alt_text='Which department?',
             template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
                 title='Which department?',
-                text='We have an English and Japanese',
+                text='Jin Wen Applied Foreign Languages has two divsions',
                 actions=[
                     PostbackAction(
                         label='English Division',
@@ -162,21 +161,21 @@ def message_list(arg, info):
                 ]
             )
         )  
-        return [image, message1, message2, message3]
+        return [image, message1, message2, sticker, message3]
     
     if arg == 'name':
         print('NAME MESSAGE')
         message = TemplateSendMessage(
             alt_text='Your name',
             template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
                 title='Please check your name.',
                 text='You can write it again if you need to.',
                 actions=[
                     PostbackAction(
                         label='My name is ' + info,
                         display_text='It would be great to know which high school you attend?',
-                        data="['High', '" + info + "']"
+                        data="['Name', '" + info + "']"
                     ),
                     PostbackAction(
                         label= 'write again',
@@ -195,7 +194,7 @@ def message_list(arg, info):
         message = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png',
                 title='Highschool',
                 text='Please check',
                 actions=[
@@ -220,7 +219,7 @@ def message_list(arg, info):
         message = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/phone.png',
                 title='Phone Number ',
                 text='Please check',
                 actions=[
@@ -249,7 +248,7 @@ def message_list(arg, info):
         message = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/globe.png',
                 title='Common Questions',
                 text='Choose one',
                 actions=[
@@ -369,6 +368,7 @@ def handle_message(event, destination):
 
     
     data_list = ast.literal_eval(event.postback.data)
+    print('DATALIST', data_list)
     if data_list[0] == 'Division':
         recruit.dept = data_list[1]
     if data_list[0] == 'Name':
