@@ -141,7 +141,7 @@ def message_list(arg, info):
                 text='Please check',
                     actions=[
                         PostbackAction(
-                            label='My name is ' + info',
+                            label='My name is ' + info,
                             display_text='Thank you.  2) It would be great to know your high school?',
                             data=info
                         ),
