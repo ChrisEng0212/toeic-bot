@@ -175,11 +175,7 @@ def message_list(arg, info):
                     MessageAction(
                         label='message',
                         text='message text'
-                    ),
-                    URIAction(
-                        label='uri',
-                        uri='http://example.com/'
-                    )                   
+                    )                  
                 ]
             )
         )
