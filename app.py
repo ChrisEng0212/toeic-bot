@@ -175,8 +175,8 @@ def message_list(arg, info):
                 actions=[
                     PostbackAction(
                         label='My name is ' + info,
-                        display_text='Next question',
-                        data="['Name', '" + info + "']"
+                        display_text='It would be great to know which high school you attend?',
+                        data="['High', '" + info + "']"
                     ),
                     PostbackAction(
                         label= 'write again',
@@ -196,7 +196,7 @@ def message_list(arg, info):
             alt_text='Buttons template',
             template=ButtonsTemplate(
                 thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
-                title='This is your highschool',
+                title='Highschool',
                 text='Please check',
                 actions=[
                     PostbackAction(
@@ -216,30 +216,65 @@ def message_list(arg, info):
         return message
         
     if arg == 'num': 
-        message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
-        thumbnail_image_url='sunrise.jpg',
-        title='HighSchool',
-        text='Please select',
-        actions=[
-                    PostbackAction(
-                        label='My number is ' + info,
-                        display_text='Thanks, now about our department....', 
-                        data=info
-                    ),
-                    PostbackAction(
-                        label='This is not correct',
-                        display_text="Sorry, let's try again. 3. What is your number?'", 
-                        data='None'
-                    ),               
-                    PostbackAction(
-                        label="I prefer not to write my number",
-                        display_text="Okay, no problem, our line BOT is a fine way to get in touch. So about our department...'", 
-                        data='None'
-                    )                
-                ]
+        print('NUMBER MESSAGE')
+        message = TemplateSendMessage(
+            alt_text='Buttons template',
+            template=ButtonsTemplate(
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                title='Phone Number ',
+                text='Please check',
+                actions=[
+                        PostbackAction(
+                            label='My number is ' + info,
+                            display_text='Thanks, now the BOT can help with some questions you may have', 
+                            data="['Num', '" + info + "']"
+                        ),
+                        PostbackAction(
+                            label='Try again',
+                            display_text="Sorry, let's try again. 3. What is your number?'", 
+                            data='None'
+                        ),               
+                        PostbackAction(
+                            label="No number for me",
+                            display_text="No problem, our line BOT is a fine way to get in touch.", 
+                            data="['Num', 'None']"
+                        )                
+                    ]
+                )
             )
-        )
         return message
+
+    if arg == 'gen': 
+        print('GEN MESSAGE')
+        message = TemplateSendMessage(
+            alt_text='Buttons template',
+            template=ButtonsTemplate(
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                title='Common Questions',
+                text='Choose one',
+                actions=[
+                        MessageAction(
+                            label='The teachers',
+                            text='Info coming soon .....',                             
+                        ),
+                        MessageAction(
+                            label='The course',
+                            text='Info coming soon .....',                             
+                        ),
+                        MessageAction(
+                            label='Contact a teacher',
+                            text='Info coming soon .....',                             
+                        ),
+                        MessageAction(
+                            label='Start an application',
+                            text='Info coming soon .....',                             
+                        ),
+                                      
+                    ]
+                )
+            )
+        return message
+    
 
 
 
@@ -308,6 +343,8 @@ def handle_message(event):
     elif recruit.number == None:
         number = event.message.text
         message = message_list('num', num)
+    else:
+        message = message_list('gen', None)
     
     
     print('EVENT', event)    
