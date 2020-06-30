@@ -137,7 +137,6 @@ def message_list(arg, info):
         message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')        
         message2 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')    
         print('WELCOME MESSAGE')
-        '''
         message3 = TemplateSendMessage(
             alt_text='Which department?',
             template=ButtonsTemplate(
@@ -163,6 +162,30 @@ def message_list(arg, info):
                 ]
             )
         ) 
+        '''
+        message3 = TemplateSendMessage(
+            alt_text='Buttons template',
+            template=ButtonsTemplate(
+                thumbnail_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                title='Menu',
+                text='Please select',
+                actions=[
+                    PostbackAction(
+                        label='postback',
+                        display_text='postback text',
+                        data='action=buy&itemid=1'
+                    ),
+                    MessageAction(
+                        label='message',
+                        text='message text'
+                    ),
+                    URIAction(
+                        label='uri',
+                        uri='http://example.com/'
+                    )
+                ]
+            )
+        )
         
         return message3
     
