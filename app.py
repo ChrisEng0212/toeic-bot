@@ -4,7 +4,7 @@ import abc
 
 
 from linebot import (
-    LineBotApi, WebhookHandler
+    LineBotApi, WebhookHandler, WebhookParser
 )
 from linebot.exceptions import (
     InvalidSignatureError
