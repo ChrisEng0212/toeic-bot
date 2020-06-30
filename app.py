@@ -281,12 +281,26 @@ def message_list(arg, info):
     
 
     
-    
+def rich_menu():
+    rich_menu_to_create = RichMenu(
+    size=RichMenuSize(width=2500, height=843),
+    selected=False,
+    name="Nice richmenu",
+    chat_bar_text="Tap here",
+    areas=[RichMenuArea(
+        bounds=RichMenuBounds(x=0, y=0, width=2500, height=843),
+        action=URIAction(label='Go to line.me', uri='https://line.me'))]
+    )
+    rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
+    print(rich_menu_id)
+
+    line_bot_api.link_rich_menu_to_user('U2dc560609e55883a4d869c88c0d912e7', rich_menu_id)   
 
 
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    rich_menu()
     print('CALLBACK')
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
