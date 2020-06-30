@@ -91,9 +91,8 @@ def login(pw):
     else:
         return 'Cannot login'
 
-    
+''' UI pages ''' 
   
-
 @app.route('/')
 def home():
     return 'Hello, World!'
@@ -103,6 +102,7 @@ def home():
 def data():
     return 'Data'
 
+''' Line Bot Actions '''
 
 @app.route('/text/<string:tx>')
 def text(tx):
@@ -131,6 +131,9 @@ def callback():
     try:
         events = parser.parse(body, signature)
         print('event PARSE', events)
+        print('event PARSE', type(events))        
+        print('event STRING', str(events))
+        print('event STRING', events.type)
     except InvalidSignatureError:
         abort(400)
 
@@ -163,7 +166,7 @@ def handle_message(event, destination):
 
 @handler.add(FollowEvent)
 def handle_follow():  
-    line_bot_api.reply_message(event.reply_token, 'welcome')
+    print()
 
 
 @handler.add(UnfollowEvent)
