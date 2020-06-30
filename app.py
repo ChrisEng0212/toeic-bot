@@ -63,6 +63,7 @@ class Students(db.Model):
     number = db.Column(db.String)
     dept = db.Column(db.String)
     questions = db.Column(db.String)
+    status = db.Column(db.String)
 
 class MyModelView(ModelView):
     def is_accessible(self):
@@ -102,6 +103,8 @@ def home():
 def data():
     return 'Data'
 
+
+
 ''' Line Bot Actions '''
 
 @app.route('/text/<string:tx>')
@@ -126,14 +129,15 @@ def callback():
     body = request.get_data(as_text=True)
     print('BODY', str(body))
     app.logger.info("Request body: " + body)
-
+    
     # parse webhook body
     try:
         events = parser.parse(body, signature)
         print('event PARSE', events)
         print('event PARSE', type(events))        
         print('event STRING', str(events))
-        print('event STRING', events.type)
+        print('event INDEX', events[0])
+        print('event TYPE', events[0].type)
     except InvalidSignatureError:
         abort(400)
 
