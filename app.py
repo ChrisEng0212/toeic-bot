@@ -18,6 +18,8 @@ line_bot_api = LineBotApi('HzvSBrRQ11nxA+2sex/gtMWHL0DjzhJZy6VOK/i0aFh1836BK0ifb
 # Channel Secret
 handler = WebhookHandler('6c1237cad81c1ba197e04f6d179e906e')
 
+parser = WebhookParser('6c1237cad81c1ba197e04f6d179e906e')
+
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
@@ -68,12 +70,7 @@ def callback():
 def handle_message(event, destination):
     print('POSTBACK', event.postback.data)
     print('RepTOK', event.reply_token)
-    print('ID', event.source) 
-    print(type(event.source)) 
-    print(SourceUser) 
-    print(SourceUser())
-    
-    
+    print('ID', event.source.user_id) 
 
     
     sticker_message = StickerSendMessage(
