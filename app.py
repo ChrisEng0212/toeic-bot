@@ -135,26 +135,29 @@ def message_list(arg, info):
         return [sticker, message1, message2, message3, message4]
     
     if arg == 'name':
-        message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
-        thumbnail_image_url='sunrise.jpg',
-        title='Name',
-        text='Please select',
-        actions=[
-                    PostbackAction(
-                        label='My name is ' + info,
-                        display_text='Thank you.  2) What is your high school?', 
-                        data=info
-                    ),
-                    PostbackAction(
-                        label='This is not correct',
-                        display_text="Sorry, let's try again. 1. What is your name?'", 
-                        data='None'
-                    )                
-                ]
+        message = TemplateSendMessage(
+            alt_text='Confirm',
+            template=ConfirmTemplate(
+                text='Please check',
+                    actions=[
+                        PostbackAction(
+                            label='My name is ' + info',
+                            display_text='Thank you.  2) It would be great to know your high school?',
+                            data=info
+                        ),
+                        MessageAction(
+                            label='This is not correct',
+                            display_text="Sorry, let's try again. 1. What is your name?'"
+                        )
+                    ]
+                )
             )
-        )
         return message
+        
     
+    
+
+
     if arg == 'high': 
         message = TemplateSendMessage(alt_text='Buttons', template=ButtonsTemplate(
         thumbnail_image_url='sunrise.jpg',
