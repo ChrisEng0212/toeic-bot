@@ -168,14 +168,15 @@ def message_list(arg, info):
                 text='Please select',
                 actions=[
                     PostbackAction(
-                        label='postback',
-                        display_text='postback text',
-                        data='action=buy&itemid=1'
+                        label='My highschool is ',
+                        display_text='Next question',
+                        data='info'
                     ),
-                    MessageAction(
-                        label='message',
-                        text='message text'
-                    )                  
+                    PostbackAction(
+                        label= 'write again',
+                        display_text='Opps, okay, try again. 2) Which highschool do you go to?',
+                        data='None'
+                    )              
                 ]
             )
         )
