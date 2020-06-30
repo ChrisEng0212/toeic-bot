@@ -171,17 +171,9 @@ def message_list(arg, info):
                 text='Please select',
                 actions=[
                     PostbackAction(
-                        label='postback',
-                        display_text='postback text',
-                        data='action=buy&itemid=1'
-                    ),
-                    MessageAction(
-                        label='message',
-                        text='message text'
-                    ),
-                    URIAction(
-                        label='uri',
-                        uri='http://example.com/'
+                        label='AFLD English Division',
+                        display_text='Got it. Please write your name first',
+                        data="['Division', 'Eng']"
                     )
                 ]
             )
