@@ -1,10 +1,8 @@
 from flask import Flask, request, abort, render_template, url_for, flash, redirect, jsonify  
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user, login_required
-
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-
 from datetime import datetime, timedelta
 import json
 import os
@@ -233,7 +231,7 @@ def callback():
                 recruit.status = 'follow'
                 db.session.commit()        
         else:            
-            newRec(line=newUser, status='follow')
+            newRec = Recruits(line=newUser, status='follow')
             db.session.add(newRec)
             db.session.commit()
 
