@@ -141,8 +141,8 @@ def message_list(arg, info):
             alt_text='Which department?',
             template=ButtonsTemplate(
                 thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
-                title='Which department are you interested in?',
-                text='We have an English and Japanese department and many other departments at JinWen university',
+                title='Which department?',
+                text='We have an English and Japanese',
                 actions=[
                     PostbackAction(
                         label='English Division',
