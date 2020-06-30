@@ -350,19 +350,19 @@ def handle_message(event):
             name = event.message.text
             message = message_list('name', name) # get template to check 
         else:
-            message = message_list('alert', name)
+            message = message_list('alert', None)
     elif recruit.highschool == None:
         if len(tx) < 10: 
             high = event.message.text
             message = message_list('high', high)
         else:
-            message = message_list('alert', name)
+            message = message_list('alert', None)
     elif recruit.number == None:
         if len(tx) < 12: 
             number = event.message.text
             message = message_list('num', number)
         else:
-            message = message_list('alert', name)
+            message = message_list('alert', None)
     else:
         message = message_list('gen', None)
     
@@ -398,6 +398,9 @@ def handle_message(event, destination):
         recruit.highschool = data_list[1]
     if data_list[0] == 'Num':
         recruit.number = data_list[1]
+        message = message_list('gen', None)
+        line_bot_api.reply_message(event.reply_token, message)
+
 
     db.session.commit()     
 
