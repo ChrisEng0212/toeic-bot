@@ -335,7 +335,7 @@ def message_list(arg, info):
         return message
 
     if arg == 'gen':
-        image_carousel_template_message = TemplateSendMessage(
+        message = TemplateSendMessage(
             alt_text='ImageCarousel template',
             template=ImageCarouselTemplate(
                 columns=[
@@ -537,18 +537,19 @@ def handle_message(event, destination):
     data_list = ast.literal_eval(event.postback.data)
     print('DATALIST', data_list)
     if data_list[0] == 'Division':
-        recruit.dept = data_list[1]
-        message = message_list('dept', None)
+        recruit.dept = data_list[1]  
+        message = message_list('gen', None)
         line_bot_api.reply_message(event.reply_token, message)
+        rich_menu(userID)      
     if data_list[0] == 'Name':
         recruit.name = data_list[1]       
     if data_list[0] == 'High':
         recruit.highschool = data_list[1]
-    if data_list[0] == 'Num':
+    if data_list[0] == 'Num':        
         recruit.number = data_list[1]
-        message = message_list('gen', None)
+        message = message_list('dept', None)
         line_bot_api.reply_message(event.reply_token, message)
-        rich_menu(userID)
+        
 
 
     db.session.commit()   
