@@ -342,7 +342,7 @@ def message_list(arg, info):
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
                         action=PostbackAction(
-                            label='About the teachers?',
+                            label='Faculty',
                             display_text='Info coming soon...',
                             data="['None', 'None']"
                         )
@@ -350,7 +350,7 @@ def message_list(arg, info):
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
                         action=PostbackAction(
-                            label='How to apply?',
+                            label='Application',
                             display_text='Info coming soon...',
                             data="['None', 'None']"
                         )
@@ -358,7 +358,7 @@ def message_list(arg, info):
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
                         action=PostbackAction(
-                            label='About the course?',
+                            label='Courses',
                             display_text='Info coming soon...',
                             data="['None', 'None']"
                         )
@@ -366,7 +366,7 @@ def message_list(arg, info):
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
                         action=PostbackAction(
-                            label='Who can I contact?',
+                            label='Contact',
                             display_text='Info coming soon...',
                             data="['None', 'None']"
                         )
