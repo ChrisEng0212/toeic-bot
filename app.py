@@ -338,7 +338,7 @@ def message_list(arg, info):
     
 
     
-def rich_menu():    
+def rich_menu():        
     rich_menu_to_create = RichMenu(
     size=RichMenuSize(width=2500, height=843),
     selected=False,
@@ -393,8 +393,10 @@ def callback():
             db.session.add(newRec)
             db.session.commit()
 
+        rich_menu()      
         line_bot_api.push_message(newUser, message_list('welcome', None))
-        return 'OK'     
+        return 'OK'   
+          
     if events[0].type == 'unfollow':
         print('ID unfollow', newUser)
         recruit = Recruits.query.filter_by(line=newUser).first()
