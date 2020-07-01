@@ -153,7 +153,7 @@ def message_list(arg, info):
                 actions=[
                     PostbackAction(
                         label=info,
-                        display_text='Thanks, got it.',
+                        display_text='Thanks, got it. Next, please write your highschool...',
                         data="['Name', '" + info + "']"
                     ),
                     PostbackAction(
@@ -339,15 +339,20 @@ def message_list(arg, info):
     
 
     
-def rich_menu():        
+def rich_menu(userID):        
     rich_menu_to_create = RichMenu(
-    size=RichMenuSize(width=2500, height=843),
+    size=RichMenuSize(width=2500, height=1600),
     selected=False,
     name="Nice richmenu",
     chat_bar_text="Tap here",
-    areas=[RichMenuArea(
-        bounds=RichMenuBounds(x=0, y=0, width=2500, height=843),
-        action=URIAction(label='Go to line.me', uri='https://line.me'))
+    areas=[
+        RichMenuArea(
+        bounds=RichMenuBounds(x=0, y=0, width=2500, height=800),
+        action=URIAction(label='Go to line.me', uri='https://line.me')),
+        RichMenuArea(
+        bounds=RichMenuBounds(x=0, y=0, width=2500, height=800),
+        action=URIAction(label='Go to line.me', uri='https://line.me')),
+
         ]
     )
     rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
@@ -356,29 +361,11 @@ def rich_menu():
     with open('banner.png', 'rb') as f:
         line_bot_api.set_rich_menu_image(rich_menu_id, 'image/png', f)
 
-    line_bot_api.link_rich_menu_to_user('U2dc560609e55883a4d869c88c0d912e7', rich_menu_id)   
+    line_bot_api.link_rich_menu_to_user(userID, rich_menu_id)   
 
 
-
-@app.route("/callback", methods=['POST'])
-def callback():        
-    print('CALLBACK')
-    # get X-Line-Signature header value
-    signature = request.headers['X-Line-Signature']
-    print('SIGNATURE', signature)
-            
-    # get request body as text
-    body = request.get_data(as_text=True)
-    print('BODY', str(body))
-    app.logger.info("Request body: " + body)
-
-    # parse webhook body
-    try:
-        events = parser.parse(body, signature) 
-        newUser = events[0].source.user_id  
-        recruit = Recruits.query.filter_by(line=newUser).first()         
-    except InvalidSignatureError:
-        abort(400)
+def follow_check(events):
+    newUser = events[0].source.user_id 
 
     if events[0].type == 'follow':        
         print('ID follow', newUser)  
@@ -400,6 +387,26 @@ def callback():
         recruit.line = '0000__' + recruit.line
         db.session.commit()
 
+
+
+@app.route("/callback", methods=['POST'])
+def callback():        
+    print('CALLBACK')
+    # get X-Line-Signature header value
+    signature = request.headers['X-Line-Signature']
+    print('SIGNATURE', signature)
+            
+    # get request body as text
+    body = request.get_data(as_text=True)
+    print('BODY', str(body))
+    app.logger.info("Request body: " + body)
+
+    # parse webhook body
+    try:
+        events = parser.parse(body, signature)         
+        follow_check(events)        
+    except InvalidSignatureError:
+        abort(400)   
     
     # handle webhook body
     try:
@@ -479,21 +486,20 @@ def handle_message(event, destination):
         db.session.add(newRec)
         db.session.commit()
         return 'OK'
-
-
     
     data_list = ast.literal_eval(event.postback.data)
     print('DATALIST', data_list)
     if data_list[0] == 'Division':
         recruit.dept = data_list[1]
     if data_list[0] == 'Name':
-        recruit.name = data_list[1]
+        recruit.name = data_list[1]       
     if data_list[0] == 'High':
         recruit.highschool = data_list[1]
     if data_list[0] == 'Num':
         recruit.number = data_list[1]
         message = message_list('gen', None)
         line_bot_api.reply_message(event.reply_token, message)
+        rich_menu(userID)
 
 
     db.session.commit()   
