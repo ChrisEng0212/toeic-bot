@@ -389,8 +389,10 @@ def callback():
             newRec = Recruits(line=newUser, status='follow')
             db.session.add(newRec)
             db.session.commit()
-
-        rich_menu()      
+        try:
+            line_bot_api.unlink_rich_menu_from_user(newUser)    
+        except: 
+            pass 
         line_bot_api.push_message(newUser, message_list('welcome', None))
         return 'OK'   
 
