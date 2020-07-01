@@ -309,8 +309,6 @@ def message_list(arg, info):
 
     
 def rich_menu():    
-    
-
     rich_menu_to_create = RichMenu(
     size=RichMenuSize(width=2500, height=843),
     selected=False,
@@ -322,7 +320,9 @@ def rich_menu():
     )
     rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
     print('RMID ', rich_menu_id)
-    line_bot_api.set_rich_menu_image(rich_menu_id, 'image/png', 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/banner.png')
+
+    with open('banner.png', 'rb') as f:
+        line_bot_api.set_rich_menu_image(rich_menu_id, 'image/png', f)
 
     line_bot_api.link_rich_menu_to_user('U2dc560609e55883a4d869c88c0d912e7', rich_menu_id)   
 
