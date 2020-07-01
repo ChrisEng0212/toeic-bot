@@ -322,7 +322,7 @@ def rich_menu():
     )
     rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
     print('RMID ', rich_menu_id)
-    line_bot_api.set_rich_menu_image(rich_menu_id, 'image/jpg', 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/star.jpg')
+    line_bot_api.set_rich_menu_image(rich_menu_id, 'image/jpeg', 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/star.jpg')
 
     line_bot_api.link_rich_menu_to_user('U2dc560609e55883a4d869c88c0d912e7', rich_menu_id)   
 
