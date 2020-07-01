@@ -374,7 +374,7 @@ def message_list(arg, info):
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
                         action=PostbackAction(
-                            label='Why study languages?',
+                            label='Why JUST?',
                             display_text='Info coming soon...',
                             data="['None', 'None']"
                         )
