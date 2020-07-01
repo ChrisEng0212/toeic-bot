@@ -167,36 +167,6 @@ def message_list(arg, info):
         )  
         return [message1, message2, message3]
 
-
-    if arg == "dept":
-         
-        print('WELCOME MESSAGE')
-        message3 = TemplateSendMessage(
-            alt_text='Which department?',
-            template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
-                title='Which department?',
-                text='Jin Wen Applied Foreign Languages has two divsions',
-                actions=[
-                    PostbackAction(
-                        label='English Division',
-                        display_text='Got it. Please write your name first',
-                        data="['Division', 'Eng']"
-                    ),
-                    PostbackAction(
-                        label= 'Japanese Division',
-                        display_text='Got it. Please write your name first',
-                        data="['Division', 'Jpn']"
-                    ),              
-                    PostbackAction(
-                        label= 'Another department',
-                        display_text='Got it. Please write your name first',
-                        data="['Division', 'Other']"
-                    )              
-                ]
-            )
-        )  
-        return [image, message1, message2, sticker, message3]
     
     if arg == 'name':
         print('NAME MESSAGE')
@@ -260,7 +230,7 @@ def message_list(arg, info):
                 actions=[
                         PostbackAction(
                             label='Phone: ' + info,
-                            display_text='Thanks, now the BOT can help with some questions you may have', 
+                            display_text='Thanks, now which department are you interested in?', 
                             data="['Num', '" + info + "']"
                         ),
                         PostbackAction(
@@ -278,6 +248,34 @@ def message_list(arg, info):
             )
         return message
 
+    if arg == "dept":         
+        print('WELCOME MESSAGE')
+        message = TemplateSendMessage(
+            alt_text='Which department?',
+            template=ButtonsTemplate(
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
+                title='Which department?',
+                text='Jin Wen Applied Foreign Languages has two divsions',
+                actions=[
+                    PostbackAction(
+                        label='English Division',
+                        display_text='Got it. Now the bot can help you with your questions',
+                        data="['Division', 'Eng']"
+                    ),
+                    PostbackAction(
+                        label= 'Japanese Division',
+                        display_text='Got it. Now the bot can help you with your questions',
+                        data="['Division', 'Jpn']"
+                    ),              
+                    PostbackAction(
+                        label= 'Another department',
+                        display_text='Got it. Now the bot can help you with your questions',
+                        data="['Division', 'Other']"
+                    )              
+                ]
+            )
+        )  
+        return message
 
     if arg == 'check': 
         print('CHECK MESSAGE')
@@ -305,7 +303,7 @@ def message_list(arg, info):
             )
         return message
 
-    if arg == 'gen': 
+    if arg == 'gen1': 
         print('GEN MESSAGE')
         message = TemplateSendMessage(
             alt_text='Buttons template',
@@ -335,6 +333,57 @@ def message_list(arg, info):
                 )
             )
         return message
+
+    if arg == 'gen':
+        image_carousel_template_message = TemplateSendMessage(
+            alt_text='ImageCarousel template',
+            template=ImageCarouselTemplate(
+                columns=[
+                    ImageCarouselColumn(
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        action=PostbackAction(
+                            label='About the teachers?',
+                            display_text='Info coming soon...',
+                            data="['None', 'None']"
+                        )
+                    ),
+                    ImageCarouselColumn(
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        action=PostbackAction(
+                            label='How to apply?',
+                            display_text='Info coming soon...',
+                            data="['None', 'None']"
+                        )
+                    ),
+                    ImageCarouselColumn(
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        action=PostbackAction(
+                            label='About the course?',
+                            display_text='Info coming soon...',
+                            data="['None', 'None']"
+                        )
+                    ),
+                    ImageCarouselColumn(
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        action=PostbackAction(
+                            label='Who can I contact?',
+                            display_text='Info coming soon...',
+                            data="['None', 'None']"
+                        )
+                    ),
+                    ImageCarouselColumn(
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        action=PostbackAction(
+                            label='Why study languages?',
+                            display_text='Info coming soon...',
+                            data="['None', 'None']"
+                        )
+                    )
+                    
+                ]
+            )
+        )
+        return message
     
     
 
@@ -348,11 +397,7 @@ def rich_menu(userID):
     areas=[
         RichMenuArea(
         bounds=RichMenuBounds(x=0, y=0, width=2500, height=800),
-        action=URIAction(label='Go to line.me', uri='https://line.me')),
-        RichMenuArea(
-        bounds=RichMenuBounds(x=0, y=0, width=2500, height=800),
-        action=URIAction(label='Go to line.me', uri='https://line.me')),
-
+        action=URIAction(label='Go to line.me', uri='https://line.me'))  
         ]
     )
     rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
@@ -360,6 +405,8 @@ def rich_menu(userID):
 
     with open('banner.png', 'rb') as f:
         line_bot_api.set_rich_menu_image(rich_menu_id, 'image/png', f)
+    
+    'https://medium.com/enjoy-life-enjoy-coding/%E4%BD%BF%E7%94%A8-python-%E7%82%BA-line-bot-%E5%BB%BA%E7%AB%8B%E7%8D%A8%E4%B8%80%E7%84%A1%E4%BA%8C%E7%9A%84%E5%9C%96%E6%96%87%E9%81%B8%E5%96%AE-rich-menus-7a5f7f40bd1'
 
     line_bot_api.link_rich_menu_to_user(userID, rich_menu_id)   
 
