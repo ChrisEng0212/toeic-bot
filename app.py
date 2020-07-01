@@ -139,6 +139,7 @@ def message_list(arg, info):
         message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')  
         sticker = StickerSendMessage(package_id='2', sticker_id='144')  
         message2 = TextSendMessage(text='How are you today?')  
+        return [image, message1, sticker, message2]
 
     if arg == 'start':
         message1 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')   
@@ -164,7 +165,7 @@ def message_list(arg, info):
                 ]
             )
         )  
-        return [image, message1, message2, sticker, message3]
+        return [message1, message2, message3]
 
 
     if arg == "dept":
@@ -375,20 +376,16 @@ def callback():
     try:
         events = parser.parse(body, signature) 
         newUser = events[0].source.user_id  
-        recruit = Recruits.query.filter_by(line=newUser).first()     
+        recruit = Recruits.query.filter_by(line=newUser).first()         
     except InvalidSignatureError:
         abort(400)
 
     if events[0].type == 'follow':        
-        print('ID follow', newUser )        
-        if recruit:
-            if recruit.status == 'left':
-                recruit.status = 'follow'
-                db.session.commit()        
-        else:            
-            newRec = Recruits(line=newUser, status='follow')
-            db.session.add(newRec)
-            db.session.commit()
+        print('ID follow', newUser)  
+        newRec = Recruits(line=newUser, status='follow')
+        db.session.add(newRec)
+        db.session.commit()
+       
         try:
             line_bot_api.unlink_rich_menu_from_user(newUser)    
         except: 
