@@ -538,6 +538,8 @@ def handle_message(event, destination):
     print('DATALIST', data_list)
     if data_list[0] == 'Division':
         recruit.dept = data_list[1]
+        message = message_list('dept', None)
+        line_bot_api.reply_message(event.reply_token, message)
     if data_list[0] == 'Name':
         recruit.name = data_list[1]       
     if data_list[0] == 'High':
