@@ -346,9 +346,6 @@ def rich_menu():
     chat_bar_text="Tap here",
     areas=[RichMenuArea(
         bounds=RichMenuBounds(x=0, y=0, width=2500, height=843),
-        action=URIAction(label='Go to line.me', uri='https://line.me')),
-        RichMenuArea(
-        bounds=RichMenuBounds(x=0, y=0, width=2500, height=843),
         action=URIAction(label='Go to line.me', uri='https://line.me'))
         ]
     )
@@ -396,7 +393,7 @@ def callback():
         rich_menu()      
         line_bot_api.push_message(newUser, message_list('welcome', None))
         return 'OK'   
-          
+
     if events[0].type == 'unfollow':
         print('ID unfollow', newUser)
         recruit = Recruits.query.filter_by(line=newUser).first()
