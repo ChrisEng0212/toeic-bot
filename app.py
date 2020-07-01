@@ -247,6 +247,33 @@ def message_list(arg, info):
             )
         return message
 
+
+    if arg == 'check': 
+        print('CHECK MESSAGE')
+        message = TemplateSendMessage(
+            alt_text='Buttons template',
+            template=ButtonsTemplate(
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/globe.png',
+                title='Thank you for getting in touch',
+                text='Name:  Highschool:...',
+                actions=[
+                        PostbackAction(
+                            label="All good :)",
+                            display_text="Nice, now lets think more about your future studies", 
+                            data="Done"
+                        ),
+                        PostbackAction(
+                            label="Start again",
+                            display_text="No problem, from the top! 1) What is your name?", 
+                            data="Restart"
+                        ),
+                        
+                                      
+                    ]
+                )
+            )
+        return message
+
     if arg == 'gen': 
         print('GEN MESSAGE')
         message = TemplateSendMessage(
@@ -281,7 +308,9 @@ def message_list(arg, info):
     
 
     
-def rich_menu():
+def rich_menu():    
+    
+
     rich_menu_to_create = RichMenu(
     size=RichMenuSize(width=2500, height=843),
     selected=False,
@@ -292,7 +321,8 @@ def rich_menu():
         action=URIAction(label='Go to line.me', uri='https://line.me'))]
     )
     rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
-    print(rich_menu_id)
+    print('RMID ', rich_menu_id)
+    line_bot_api.set_rich_menu_image(rich_menu_id, 'image/png', 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/globe.png')
 
     line_bot_api.link_rich_menu_to_user('U2dc560609e55883a4d869c88c0d912e7', rich_menu_id)   
 
@@ -300,6 +330,7 @@ def rich_menu():
 
 @app.route("/callback", methods=['POST'])
 def callback():    
+    rich_menu()
     print('CALLBACK')
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
@@ -335,7 +366,7 @@ def callback():
         print('ID unfollow', newUser)
         recruit = Recruits.query.filter_by(line=newUser).first()
         recruit.status = 'left'
-        recruit.line = '0000' + recruit.line
+        recruit.line = '0000__' + recruit.line
         db.session.commit()
 
     
@@ -400,6 +431,17 @@ def handle_message(event, destination):
     else:
         userID = event.source.user_id
         recruit = Recruits.query.filter_by(line=userID).first() 
+    
+    if data == 'Done':
+        ## send message
+        return 'OK'
+    if data == 'Restart':
+        recruit.delete()
+        newRec = Recruits(line=userID, status='follow')
+        db.session.add(newRec)
+        db.session.commit()
+        return 'OK'
+
 
     
     data_list = ast.literal_eval(event.postback.data)
@@ -416,7 +458,8 @@ def handle_message(event, destination):
         line_bot_api.reply_message(event.reply_token, message)
 
 
-    db.session.commit()     
+    db.session.commit()   
+    return 'OK'  
 
     #profile = line_bot_api.get_profile(user_id)
     #print(profile)
