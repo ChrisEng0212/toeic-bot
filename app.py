@@ -135,10 +135,40 @@ def message_list(arg, info):
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG'
-        )
+        )        
+        message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')  
         sticker = StickerSendMessage(package_id='2', sticker_id='144')  
-        message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')        
-        message2 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')    
+        message2 = TextSendMessage(text='How are you today?')  
+
+    if arg == 'start':
+        message1 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')   
+        message2 = TextSendMessage(text='First we need some simple details')  
+        message3 = TemplateSendMessage(
+            alt_text='What is your name?',
+            template=ButtonsTemplate(
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
+                title='What is your name?',
+                text='Should we use your line name?',
+                actions=[
+                    PostbackAction(
+                        label=info,
+                        display_text='Thanks, got it.',
+                        data="['Name', '" + info + "']"
+                    ),
+                    PostbackAction(
+                        label= 'Write name',
+                        text='Okay. Please write your name....',
+                        data="['Name', '159']"
+                    ),              
+                                
+                ]
+            )
+        )  
+        return [image, message1, message2, sticker, message3]
+
+
+    if arg == "dept":
+         
         print('WELCOME MESSAGE')
         message3 = TemplateSendMessage(
             alt_text='Which department?',
@@ -316,7 +346,11 @@ def rich_menu():
     chat_bar_text="Tap here",
     areas=[RichMenuArea(
         bounds=RichMenuBounds(x=0, y=0, width=2500, height=843),
-        action=URIAction(label='Go to line.me', uri='https://line.me'))]
+        action=URIAction(label='Go to line.me', uri='https://line.me')),
+        RichMenuArea(
+        bounds=RichMenuBounds(x=0, y=0, width=2500, height=843),
+        action=URIAction(label='Go to line.me', uri='https://line.me'))
+        ]
     )
     rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
     print('RMID ', rich_menu_id)
@@ -329,8 +363,7 @@ def rich_menu():
 
 
 @app.route("/callback", methods=['POST'])
-def callback():    
-    rich_menu()
+def callback():        
     print('CALLBACK')
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
@@ -383,9 +416,7 @@ def callback():
 
 
 @handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):  
-     #profile = line_bot_api.get_profile(user_id)
-    #print(profile)
+def handle_message(event):      
   
     #message = TextSendMessage(text=event.message.text)  
     userID = event.source.user_id
@@ -394,11 +425,16 @@ def handle_message(event):
     tx = event.message.text
 
     if recruit.name == None:
-        if len(tx) < 11:            
+        profile = line_bot_api.get_profile(userID)
+        name = profile.display_name
+        message = message_list('start', name) # get template to check         
+    elif recruit.name == '159':
+        if len(tx) < 11: 
             name = event.message.text
-            message = message_list('name', name) # get template to check 
+            message = message_list('name', name)
         else:
-            message = message_list('alert', None)
+            message = message_list('alert', None)        
+        
     elif recruit.highschool == None:
         if len(tx) < 11: 
             high = event.message.text
@@ -440,6 +476,7 @@ def handle_message(event, destination):
         return 'OK'
     if data == 'Restart':
         recruit.delete()
+        db.session.commit()
         newRec = Recruits(line=userID, status='follow')
         db.session.add(newRec)
         db.session.commit()
