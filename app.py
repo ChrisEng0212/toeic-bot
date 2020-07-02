@@ -491,16 +491,17 @@ def handle_message(event):
 
     tx = event.message.text
 
-    if recruit.name == None:
+    if recruit.status < 2:
         profile = line_bot_api.get_profile(userID)
         name = profile.display_name
-        message = message_list('start', name) # get template to check         
-    elif recruit.name == '159':
-        if len(tx) < 11: 
-            name = event.message.text
-            message = message_list('nameConfirm', name)
-        else:
-            message = message_list('alert', None)        
+        if recruit.name == None:
+            message = message_list('start', name) # get template to check         
+        elif recruit.name == '159':
+            if len(tx) < 11: 
+                name = event.message.text
+                message = message_list('nameConfirm', name)
+            else:
+                message = message_list('alert', None)        
         
     elif recruit.status < 3:
         if len(tx) < 11: 
