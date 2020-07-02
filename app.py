@@ -255,12 +255,7 @@ def message_list(arg, info):
                             label='Try again',
                             display_text="Okay, let's try again. My phone number is ...'", 
                             data='None'
-                        ),               
-                        PostbackAction(
-                            label="No number",
-                            display_text="No problem, the line BOT is a fine way to get in touch.", 
-                            data="['Num', 'None']"
-                        )                
+                        )
                     ]
                 )
             )
