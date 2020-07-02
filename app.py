@@ -666,6 +666,12 @@ def handle_unfollow():
 @handler.default()
 def default(event):
     print('DEFAULT', event)
+    message_id = event.message.id
+    message_content = line_bot_api.get_message_content(message_id)
+
+    with open('/static/', 'wb') as fd:
+        for chunk in message_content.iter_content():
+            fd.write(chunk)
 
 
 
