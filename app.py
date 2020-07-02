@@ -211,7 +211,7 @@ def message_list(arg, info):
                     ),
                     PostbackAction(
                         label= 'Not this',
-                        text='My name is...',
+                        display_text='My name is...',
                         data="['Name', '159']"
                     ),
                 ]
