@@ -152,7 +152,32 @@ def message_list(arg, info):
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/phone.png'
         ) 
         message = TextSendMessage(text='This is going well! now which department are you interested in?') 
-        return [image, message]
+        confirm = TemplateSendMessage(
+            alt_text='Which department?',
+            template=ButtonsTemplate(
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
+                title='Which department?',
+                text='Jin Wen Applied Foreign Languages has two divsions.',
+                actions=[
+                    PostbackAction(
+                        label='English Division',
+                        display_text='English Division',
+                        data="['Division', 'Eng']"
+                    ),
+                    PostbackAction(
+                        label= 'Japanese Division',
+                        display_text='Japanese Division',
+                        data="['Division', 'Jpn']"
+                    ),              
+                    PostbackAction(
+                        label= 'Another Department',
+                        display_text='Another Department',
+                        data="['Division', 'Other']"
+                    )              
+                ]
+            )
+        )  
+        return [image, message, confirm]
 
     if arg == 'deptSet': 
         sticker = StickerSendMessage(package_id='2', sticker_id='141')  
@@ -261,34 +286,8 @@ def message_list(arg, info):
             )
         return message
 
-    if arg == "deptConfirm":         
-        print('WELCOME MESSAGE')
-        message = TemplateSendMessage(
-            alt_text='Which department?',
-            template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
-                title='Which department?',
-                text='Jin Wen Applied Foreign Languages has two divsions.',
-                actions=[
-                    PostbackAction(
-                        label='English Division',
-                        display_text='English Division',
-                        data="['Division', 'Eng']"
-                    ),
-                    PostbackAction(
-                        label= 'Japanese Division',
-                        display_text='Japanese Division',
-                        data="['Division', 'Jpn']"
-                    ),              
-                    PostbackAction(
-                        label= 'Another Department',
-                        display_text='Another Department',
-                        data="['Division', 'Other']"
-                    )              
-                ]
-            )
-        )  
-        return message
+           
+        
 
     if arg == 'check': 
         print('CHECK MESSAGE')
