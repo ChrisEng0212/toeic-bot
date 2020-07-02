@@ -143,8 +143,27 @@ def message_list(arg, info):
 
     if arg == 'start':
         message1 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')   
-        message2 = TextSendMessage(text='First we need some simple details')  
+        message2 = TextSendMessage(text='First we need some simple details') 
+        message2 = TextSendMessage(text='Should we use your LINE name?') 
         message3 = TemplateSendMessage(
+            alt_text='Confirm template',
+            template=ConfirmTemplate(
+                text='Name',
+                actions=[
+                    PostbackAction(
+                        label=info,
+                        display_text='Thanks, got it. Next, please write your highschool...',
+                        data="['Name', '" + info + "']"
+                    ),
+                    PostbackAction(
+                        label= 'Not this',
+                        text='Okay. Please write your name....',
+                        data="['Name', '159']"
+                    ),
+                ]
+            )
+        )
+        message4 = TemplateSendMessage(
             alt_text='What is your name?',
             template=ButtonsTemplate(
                 thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
@@ -168,6 +187,31 @@ def message_list(arg, info):
         return [message1, message2, message3]
 
     
+    if arg == 'name2':
+        print('NAME MESSAGE')
+        message = TemplateSendMessage(
+            alt_text='Your name',
+            template=ButtonsTemplate(
+                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
+                title='Please check your name.',
+                text='You can write it again if you need to.',
+                actions=[
+                    PostbackAction(
+                        label='My name is ' + info,
+                        display_text='Please tell us which high school you attend?',
+                        data="['Name', '" + info + "']"
+                    ),
+                    PostbackAction(
+                        label= 'write again',
+                        display_text='No problem, try again. 1) What is your name?',
+                        data='None'
+                    )              
+                ]
+            )
+        )
+        print('MESSAGE', message)
+        return message
+
     if arg == 'name':
         print('NAME MESSAGE')
         message = TemplateSendMessage(
@@ -340,7 +384,7 @@ def message_list(arg, info):
             template=ImageCarouselTemplate(
                 columns=[
                     ImageCarouselColumn(
-                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/faculty.png',
                         action=PostbackAction(
                             label='Faculty',
                             display_text='Info coming soon...',
@@ -348,7 +392,7 @@ def message_list(arg, info):
                         )
                     ),
                     ImageCarouselColumn(
-                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/application.png',
                         action=PostbackAction(
                             label='Application',
                             display_text='Info coming soon...',
@@ -356,7 +400,7 @@ def message_list(arg, info):
                         )
                     ),
                     ImageCarouselColumn(
-                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/courses.png',
                         action=PostbackAction(
                             label='Courses',
                             display_text='Info coming soon...',
@@ -364,7 +408,7 @@ def message_list(arg, info):
                         )
                     ),
                     ImageCarouselColumn(
-                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/contact.png',
                         action=PostbackAction(
                             label='Contact',
                             display_text='Info coming soon...',
@@ -372,7 +416,7 @@ def message_list(arg, info):
                         )
                     ),
                     ImageCarouselColumn(
-                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/download.jpg',
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/why.jpg',
                         action=PostbackAction(
                             label='Why JUST?',
                             display_text='Info coming soon...',
