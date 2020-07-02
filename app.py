@@ -263,7 +263,7 @@ def message_list(arg, info):
                     ),
                     PostbackAction(
                         label= 'Not this',
-                        display_text='My highschool is...',
+                        display_text='One more time.',
                         data="['High', None]"
                     ),
                 ]
@@ -285,7 +285,7 @@ def message_list(arg, info):
                         ),
                         PostbackAction(
                             label='Try again',
-                            display_text="Okay, let's try again. My phone number is ...'", 
+                            display_text="Okay, let's try again.'", 
                             data="['Num', None]"
                         )
                     ]
@@ -669,7 +669,7 @@ def default(event):
     message_id = event.message.id
     message_content = line_bot_api.get_message_content(message_id)
 
-    with open('/static/', 'wb') as fd:
+    with open('/', 'wb') as fd:
         for chunk in message_content.iter_content():
             fd.write(chunk)
 
