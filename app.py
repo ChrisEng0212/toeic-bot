@@ -151,7 +151,7 @@ def message_list(arg, info):
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/globe.png',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/globe.png'
         ) 
-        message = TextSendMessage(text='This is going well! now which department are you interested in?') 
+        message = TextSendMessage(text='This is going well! Now which department are you interested in?') 
         confirm = TemplateSendMessage(
             alt_text='Which department?',
             template=ButtonsTemplate(
@@ -263,8 +263,8 @@ def message_list(arg, info):
                     ),
                     PostbackAction(
                         label= 'Not this',
-                        text='My highschool is...',
-                        data="None"
+                        display_text='My highschool is...',
+                        data="['High', None]"
                     ),
                 ]
             )
@@ -286,7 +286,7 @@ def message_list(arg, info):
                         PostbackAction(
                             label='Try again',
                             display_text="Okay, let's try again. My phone number is ...'", 
-                            data='None'
+                            data="['Num', None]"
                         )
                     ]
                 )
@@ -568,7 +568,7 @@ def handle_message(event, destination):
     if data_list[0] == 'Name':
         if data_list[1] == '159':
             recruit.name = data_list[1] 
-            message = TextSendMessage(text='Please enter your name')
+            message = TextSendMessage(text='Please enter your name...')
             send(message) 
         else:
             recruit.name = data_list[1]     
@@ -577,15 +577,23 @@ def handle_message(event, destination):
             send(message)    
     
     if data_list[0] == 'High':
-        recruit.highschool = data_list[1]
-        recruit.status = 3  
-        message = message_list('highSet', None)
-        send(message)           
-    if data_list[0] == 'Num':        
-        recruit.number = data_list[1]
-        recruit.status = 4
-        message = message_list('numSet', None)
-        send(message)        
+        if data_list[1] == None:
+            message = TextSendMessage(text='Please enter your highschool...')
+            send(message) 
+        else:
+            recruit.highschool = data_list[1]
+            recruit.status = 3  
+            message = message_list('highSet', None)
+            send(message)           
+    if data_list[0] == 'Num':  
+        if data_list[1] == None:
+            message = TextSendMessage(text='Please enter your phone number...')
+            send(message) 
+        else:      
+            recruit.number = data_list[1]
+            recruit.status = 4
+            message = message_list('numSet', None)
+            send(message)        
     if data_list[0] == 'Division':
         recruit.dept = data_list[1]  
         recruit.status = 5
