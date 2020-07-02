@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import json
 import os
 import ast 
+import time
 
 try:
     from meta import SQLALCHEMY_DATABASE_URI, SECRET_KEY, DEBUG, channel_access_token, channel_secret
@@ -54,15 +55,6 @@ class User(db.Model, UserMixin):
     username =  db.Column(db.String(20), unique=True, nullable=False)    
     
 
-class Students(db.Model):
-    id = db.Column(db.Integer, primary_key=True) 
-    line = db.Column(db.String)
-    name = db.Column(db.String)
-    highschool = db.Column(db.String)
-    number = db.Column(db.String)
-    dept = db.Column(db.String)
-    questions = db.Column(db.String)    
-
 class Recruits(db.Model):
     id = db.Column(db.Integer, primary_key=True) 
     line = db.Column(db.String)
@@ -72,7 +64,15 @@ class Recruits(db.Model):
     number = db.Column(db.String)
     dept = db.Column(db.String)
     questions = db.Column(db.String)
-    status = db.Column(db.String)
+    set1 = db.Column(db.String)
+    set2 = db.Column(db.String)
+    set3 = db.Column(db.String)
+    set4 = db.Column(db.String)
+    set5 = db.Column(db.String)
+    set6 = db.Column(db.String)
+    set7 = db.Column(db.String)
+    set8 = db.Column(db.String)
+    status = db.Column(db.Integer)
 
 class MyModelView(ModelView):
     def is_accessible(self):
@@ -83,7 +83,6 @@ class MyModelView(ModelView):
 
 admin = Admin(app)
 admin.add_view(MyModelView(User, db.session))
-admin.add_view(MyModelView(Students, db.session))
 admin.add_view(MyModelView(Recruits, db.session))
     
 
@@ -130,6 +129,36 @@ def message_list(arg, info):
     if arg == 'alert': 
         message = TextSendMessage(text='Sorry this answer is too long, please make it shorter (<10)') 
         return message
+        
+    if arg == 'nameSet': 
+        image = ImageSendMessage(
+            original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
+            preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png'
+        )  
+        message = TextSendMessage(text='Thanks, got it. Next, please write your highschool...') 
+        return [image, message]
+
+    if arg == 'highSet': 
+        image = ImageSendMessage(
+            original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png',
+            preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png'
+        ) 
+        message = TextSendMessage(text='Okay, thanks. Could we have your phone number for contacting?') 
+        return [image, message]
+
+    if arg == 'numSet': 
+        image = ImageSendMessage(
+            original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/phone.png',
+            preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/phone.png'
+        ) 
+        message = TextSendMessage(text='This is going well! now which department are you interested in?') 
+        return [image, message]
+
+    if arg == 'deptSet': 
+        sticker = StickerSendMessage(package_id='2', sticker_id='141')  
+        message1 = TextSendMessage(text='Great, all set. Now the BOT can help with any questions you might have about the Department or our Application Process')    
+        return [sticker, message]
+
 
     if arg == "welcome":
         image = ImageSendMessage(
@@ -152,139 +181,84 @@ def message_list(arg, info):
                 actions=[
                     PostbackAction(
                         label=info,
-                        display_text='Thanks, got it. Next, please write your highschool...',
+                        display_text='NAME SET: ' + info ,
                         data="['Name', '" + info + "']"
                     ),
                     PostbackAction(
                         label= 'Not this',
-                        text='Okay. Please write your name....',
+                        text='My name is...',
                         data="['Name', '159']"
                     ),
                 ]
             )
         )
-        message0 = TemplateSendMessage(
-            alt_text='What is your name?',
-            template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
-                title='What is your name?',
-                text='Should we use your line name?',
+        
+        return [message1, message2, message3, message4]
+    
+    
+    if arg == 'nameConfirm':
+        message1 = TemplateSendMessage(
+            alt_text='Confirm template',
+            template=ConfirmTemplate(
+                text='Check Name',
                 actions=[
                     PostbackAction(
                         label=info,
-                        display_text='Thanks, got it. Next, please write your highschool...',
+                        display_text='NAME SET: ' + info ,
                         data="['Name', '" + info + "']"
                     ),
                     PostbackAction(
-                        label= 'Write name',
-                        text='Okay. Please write your name....',
+                        label= 'Not this',
+                        text='My name is...',
                         data="['Name', '159']"
-                    ),              
-                                
-                ]
-            )
-        )  
-        return [message1, message2, message3, message4]
-
-    
-    if arg == 'name2':
-        print('NAME MESSAGE')
-        message = TemplateSendMessage(
-            alt_text='Your name',
-            template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
-                title='Please check your name.',
-                text='You can write it again if you need to.',
-                actions=[
-                    PostbackAction(
-                        label='My name is ' + info,
-                        display_text='Please tell us which high school you attend?',
-                        data="['Name', '" + info + "']"
                     ),
-                    PostbackAction(
-                        label= 'write again',
-                        display_text='No problem, try again. 1) What is your name?',
-                        data='None'
-                    )              
                 ]
             )
         )
-        print('MESSAGE', message)
         return message
-
-    if arg == 'name':
-        print('NAME MESSAGE')
-        message = TemplateSendMessage(
-            alt_text='Your name',
-            template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
-                title='Please check your name.',
-                text='You can write it again if you need to.',
-                actions=[
-                    PostbackAction(
-                        label='My name is ' + info,
-                        display_text='Please tell us which high school you attend?',
-                        data="['Name', '" + info + "']"
-                    ),
-                    PostbackAction(
-                        label= 'write again',
-                        display_text='No problem, try again. 1) What is your name?',
-                        data='None'
-                    )              
-                ]
-            )
-        )
-        print('MESSAGE', message)
-        return message
-        
     
-    if arg == 'high': 
+    if arg == 'highConfirm': 
         print('HIGH MESSAGE')
         message = TemplateSendMessage(
-            alt_text='Buttons template',
-            template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png',
-                title='Highschool',
-                text='Please check',
+            alt_text='Confirm template',
+            template=ConfirmTemplate(
+                text='Check Highschool',
                 actions=[
                     PostbackAction(
-                        label='School: ' + info,
-                        display_text='Could we have your phone number for contacting?',
+                        label=info,
+                        display_text='HIGHSCHOOL SET: ' + info ,
                         data="['High', '" + info + "']"
                     ),
                     PostbackAction(
-                        label= 'write again',
-                        display_text='Opps, okay, try again. 2) Which highschool do you go to?',
-                        data='None'
-                    )              
+                        label= 'Not this',
+                        text='My highschool is...',
+                        data="None"
+                    ),
                 ]
             )
         )
-        print('MESSAGE', message)
         return message
         
-    if arg == 'num': 
+    if arg == 'numConfirm': 
         print('NUMBER MESSAGE')
         message = TemplateSendMessage(
             alt_text='Buttons template',
-            template=ButtonsTemplate(
-                thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/phone.png',
-                title='Phone Number ',
-                text='Please check',
+            template=ConfirmTemplate(
+                text='Check Number',               
                 actions=[
                         PostbackAction(
-                            label='Phone: ' + info,
-                            display_text='Thanks, now which department are you interested in?', 
+                            label=info,
+                            display_text='NUMBER SET: ' + info, 
                             data="['Num', '" + info + "']"
                         ),
                         PostbackAction(
                             label='Try again',
-                            display_text="Sorry, let's try again. 3. What is your number?'", 
+                            display_text="Okay, let's try again. My phone number is ...'", 
                             data='None'
                         ),               
                         PostbackAction(
-                            label="No number for me",
-                            display_text="No problem, our line BOT is a fine way to get in touch.", 
+                            label="No number",
+                            display_text="No problem, the line BOT is a fine way to get in touch.", 
                             data="['Num', 'None']"
                         )                
                     ]
@@ -292,28 +266,28 @@ def message_list(arg, info):
             )
         return message
 
-    if arg == "dept":         
+    if arg == "deptConfirm":         
         print('WELCOME MESSAGE')
         message = TemplateSendMessage(
             alt_text='Which department?',
             template=ButtonsTemplate(
                 thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
                 title='Which department?',
-                text='Jin Wen Applied Foreign Languages has two divsions',
+                text='Jin Wen Applied Foreign Languages has two divsions.',
                 actions=[
                     PostbackAction(
                         label='English Division',
-                        display_text='Got it. Now the bot can help you with your questions',
+                        display_text='English Division',
                         data="['Division', 'Eng']"
                     ),
                     PostbackAction(
                         label= 'Japanese Division',
-                        display_text='Got it. Now the bot can help you with your questions',
+                        display_text='Japanese Division',
                         data="['Division', 'Jpn']"
                     ),              
                     PostbackAction(
-                        label= 'Another department',
-                        display_text='Got it. Now the bot can help you with your questions',
+                        label= 'Another Department',
+                        display_text='Another Department',
                         data="['Division', 'Other']"
                     )              
                 ]
@@ -378,7 +352,7 @@ def message_list(arg, info):
             )
         return message
 
-    if arg == 'gen':
+    if arg == 'general':       
         message = TemplateSendMessage(
             alt_text='ImageCarousel template',
             template=ImageCarouselTemplate(
@@ -387,40 +361,40 @@ def message_list(arg, info):
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/faculty.png',
                         action=PostbackAction(
                             label='Faculty',
-                            display_text='Info coming soon...',
-                            data="['None', 'None']"
+                            display_text='I would like to know about JUST AFLD teachers...',
+                            data="['Apply', 'None']"
                         )
                     ),
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/application.png',
                         action=PostbackAction(
                             label='Application',
-                            display_text='Info coming soon...',
-                            data="['None', 'None']"
+                            display_text='How can I apply for JUST AFLD?',
+                            data="['Apply', 'None']"
                         )
                     ),
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/courses.png',
                         action=PostbackAction(
                             label='Courses',
-                            display_text='Info coming soon...',
-                            data="['None', 'None']"
+                            display_text='What kind of course would I study at JUST AFLD?',
+                            data="['Courses', 'None']"
                         )
                     ),
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/contact.png',
                         action=PostbackAction(
                             label='Contact',
-                            display_text='Info coming soon...',
-                            data="['None', 'None']"
+                            display_text='Can I contact someone at JUST AFLD?',
+                            data="['Contact', 'None']"
                         )
                     ),
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/why.png',
                         action=PostbackAction(
                             label='Why JUST?',
-                            display_text='Info coming soon...',
-                            data="['None', 'None']"
+                            display_text='Why is JUST AFLD a good choice for me?',
+                            data="['Why', 'None']"
                         )
                     )
                     
@@ -463,7 +437,7 @@ def follow_check(events):
 
     if events[0].type == 'follow':        
         print('ID follow', newUser)  
-        newRec = Recruits(line=newUser, status='follow')
+        newRec = Recruits(line=newUser, status=1)
         db.session.add(newRec)
         db.session.commit()
        
@@ -477,7 +451,7 @@ def follow_check(events):
     if events[0].type == 'unfollow':
         print('ID unfollow', newUser)
         recruit = Recruits.query.filter_by(line=newUser).first()
-        recruit.status = 'left'
+        recruit.status = 0
         recruit.line = '0000__' + recruit.line
         db.session.commit()
 
@@ -583,19 +557,58 @@ def handle_message(event, destination):
     
     data_list = ast.literal_eval(event.postback.data)
     print('DATALIST', data_list)
-    if data_list[0] == 'Division':
-        recruit.dept = data_list[1]  
-        message = message_list('gen', None)
-        line_bot_api.reply_message(event.reply_token, message)
-        rich_menu(userID)      
+
+    
     if data_list[0] == 'Name':
-        recruit.name = data_list[1]       
+        recruit.name = data_list[1]     
+        recruit.status = 2  
+        message = message_list('nameSet', None)
+        line_bot_api.reply_message(event.reply_token, message)    
+    
     if data_list[0] == 'High':
         recruit.highschool = data_list[1]
+        recruit.status = 3  
+        message = message_list('highSet', None)
+        line_bot_api.reply_message(event.reply_token, message)    
+
     if data_list[0] == 'Num':        
         recruit.number = data_list[1]
-        message = message_list('dept', None)
+        recruit.status = 4
+        message = message_list('numSet', None)
         line_bot_api.reply_message(event.reply_token, message)
+
+    if data_list[0] == 'Division':
+        recruit.dept = data_list[1]  
+        recruit.status = 5
+        message = message_list('deptSet', None)
+        line_bot_api.reply_message(event.reply_token, message)        
+        time.sleep(2) 
+        message = message_list('general', None)
+        line_bot_api.reply_message(event.reply_token, message)
+        #rich_menu(userID)   
+
+    
+    if data_list[0] == 'Faculty':
+        recruit.set1 = data_list[0]
+        message = TextSendMessage(text='Faculty info comming soon...')
+        line_bot_api.reply_message(event.reply_token, message)
+    if data_list[0] == 'Courses':
+        recruit.set2 = data_list[0]
+        message = TextSendMessage(text='Courses info comming soon...')
+        line_bot_api.reply_message(event.reply_token, message)
+    if data_list[0] == 'Contact':
+        recruit.set3 = data_list[0]
+        message = TextSendMessage(text='Here is a list of professors you can add to your LINE....')
+        line_bot_api.reply_message(event.reply_token, message)
+    if data_list[0] == 'Why':
+        recruit.set4 = data_list[0]
+        message = TextSendMessage(text='Why study langauges? Why study at university? Answers coming soon....')
+        line_bot_api.reply_message(event.reply_token, message)
+    if data_list[0] == 'Apply':
+        recruit.set5 = data_list[0]
+        message = TextSendMessage(text='Are application process is very easy. First...')
+        line_bot_api.reply_message(event.reply_token, message)
+
         
 
 
