@@ -133,7 +133,7 @@ def message_list(arg, info):
     if arg == 'nameSet': 
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png',
-            preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png'
+            preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png'
         )  
         message = TextSendMessage(text='Thanks, got it. Next, please write your highschool...') 
         return [image, message]
@@ -181,7 +181,7 @@ def message_list(arg, info):
 
     if arg == 'deptSet': 
         sticker = StickerSendMessage(package_id='2', sticker_id='141')  
-        message1 = TextSendMessage(text='Great, all set. Now the BOT can help with any questions you might have about the Department or our Application Process')    
+        message = TextSendMessage(text='Great, all set. Now the BOT can help with any questions you might have about the Department or our Application Process')    
         return [sticker, message]
 
 
@@ -542,6 +542,7 @@ def handle_message(event, destination):
     
     if data_list[0] == 'Name':
         if data_list[1] == '159':
+            recruit.name = data_list[1] 
             message = TextSendMessage(text='Please enter your name')
             send(message) 
         else:
