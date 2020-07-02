@@ -229,7 +229,7 @@ def message_list(arg, info):
     
     
     if arg == 'nameConfirm':
-        messag1 = TemplateSendMessage(
+        message = TemplateSendMessage(
             alt_text='Confirm template',
             template=ConfirmTemplate(
                 text='Check Name',
