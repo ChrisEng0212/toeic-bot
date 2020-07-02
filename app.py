@@ -444,7 +444,7 @@ def rich_menu(userID):
         action=URIAction(label='Go to line.me', uri='https://line.me')), 
         RichMenuArea(
         bounds=RichMenuBounds(x=1250, y=0, width=1250, height=800),
-        action=URIAction(label='Go to line.me', uri='https://line.me'))  
+        action=URIAction(label='Go to line.me', uri='https://github.com/line/demo-rich-menu-bot'))  
         ]
     )
     rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
