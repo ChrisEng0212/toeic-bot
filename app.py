@@ -473,6 +473,7 @@ def handle_message(event):
         name = profile.display_name
         if recruit.name == None:
             message = message_list('start1', name) 
+            line_bot_api.push_message(userID, message)
             line_bot_api.reply_message(event.reply_token, message)
             time.sleep(5) 
             message = message_list('start2', name) 
@@ -566,7 +567,7 @@ def handle_message(event, destination):
         recruit.dept = data_list[1]  
         recruit.status = 5
         message = message_list('deptSet', None)
-        send(message)        
+        line_bot_api.push_message(userID, message)   
         time.sleep(2) 
         message = message_list('general', None)
         send(message)
