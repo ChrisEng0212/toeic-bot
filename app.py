@@ -229,7 +229,7 @@ def message_list(arg, info):
     
     
     if arg == 'nameConfirm':
-        message1 = TemplateSendMessage(
+        messag1 = TemplateSendMessage(
             alt_text='Confirm template',
             template=ConfirmTemplate(
                 text='Check Name',
@@ -293,7 +293,26 @@ def message_list(arg, info):
             )
         return message
 
-           
+    if arg == 'genConfirm':
+        message = TemplateSendMessage(
+            alt_text='Confirm template',
+            template=ConfirmTemplate(
+                text='Ask another question?',
+                actions=[
+                    PostbackAction(
+                        label='Yes',
+                        display_text='I want to learn more',
+                        data="['Gen', 'Yes']"
+                    ),
+                    PostbackAction(
+                        label= 'No',
+                        display_text='I will learn more later',
+                        data="['Gen', 'No']"
+                    ),
+                ]
+            )
+        )
+        return message       
         
 
     if arg == 'check': 
@@ -466,7 +485,7 @@ def handle_message(event):
     userID = event.source.user_id
     recruit = Recruits.query.filter_by(line=userID).first()
 
-    tx = event.message.text
+    tx = event.message.text    
 
     if recruit.status < 2:
         profile = line_bot_api.get_profile(userID)
@@ -474,7 +493,7 @@ def handle_message(event):
         if recruit.name == None:
             message = message_list('start1', name) 
             line_bot_api.push_message(userID, message)
-            time.sleep(5) 
+            time.sleep(4) 
             message = message_list('start2', name) 
         elif recruit.name == '159':
             if len(tx) < 11: 
@@ -535,7 +554,13 @@ def handle_message(event, destination):
     def send(message):
         line_bot_api.reply_message(event.reply_token, message)
 
+    def push(arg):
+        if arg == 1:
+            time.sleep(3)
+            message = message_list('genConfirm', None)        
+            line_bot_api.push_message(userID, message)
 
+        
     data_list = ast.literal_eval(event.postback.data)
     print('DATALIST', data_list)
 
@@ -555,14 +580,12 @@ def handle_message(event, destination):
         recruit.highschool = data_list[1]
         recruit.status = 3  
         message = message_list('highSet', None)
-        send(message)    
-
+        send(message)           
     if data_list[0] == 'Num':        
         recruit.number = data_list[1]
         recruit.status = 4
         message = message_list('numSet', None)
-        send(message)
-
+        send(message)        
     if data_list[0] == 'Division':
         recruit.dept = data_list[1]  
         recruit.status = 5
@@ -578,22 +601,40 @@ def handle_message(event, destination):
         recruit.set1 = data_list[0]
         message = TextSendMessage(text='Faculty info coming soon...')
         send(message)
+        push(1)  
     if data_list[0] == 'Courses':
         recruit.set2 = data_list[0]
         message = TextSendMessage(text='Courses info coming soon...')
-        send(message)
+        send(message)   
+        push(1)  
     if data_list[0] == 'Contact':
         recruit.set3 = data_list[0]
         message = TextSendMessage(text='Here is a list of professors you can add to your LINE....')
         send(message)
+        push(1)
     if data_list[0] == 'Why':
         recruit.set4 = data_list[0]
         message = TextSendMessage(text='Why study langauges? Why study at university? Answers coming soon....')
         send(message)
+        push(1)
     if data_list[0] == 'Apply':
         recruit.set5 = data_list[0]
         message = TextSendMessage(text='Our application process is very easy. First...')
         send(message)
+        push(1)
+
+    if data_list[0] == 'Gen':
+        if data_list[1] =='Yes':
+            message = message_list('general', None)
+            send(message)
+        else:            
+            m1 = TextSendMessage(text='Great, thank you for paying an interest in our department.')             
+            m2 = TextSendMessage(text='JUST-BOT will send some useful information in the future')
+            m3 = TextSendMessage(text='Just say "Hi" to get more information')
+            sticker = StickerSendMessage(package_id='2', sticker_id='159') 
+                          
+            send([m1, m2, sticker, m3])
+            
 
         
 
