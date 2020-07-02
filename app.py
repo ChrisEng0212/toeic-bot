@@ -144,8 +144,8 @@ def message_list(arg, info):
     if arg == 'start':
         message1 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')   
         message2 = TextSendMessage(text='First we need some simple details') 
-        message2 = TextSendMessage(text='Should we use your LINE name?') 
-        message3 = TemplateSendMessage(
+        message3 = TextSendMessage(text='Should we use your LINE name?') 
+        message4 = TemplateSendMessage(
             alt_text='Confirm template',
             template=ConfirmTemplate(
                 text='Name',
@@ -163,7 +163,7 @@ def message_list(arg, info):
                 ]
             )
         )
-        message4 = TemplateSendMessage(
+        message0 = TemplateSendMessage(
             alt_text='What is your name?',
             template=ButtonsTemplate(
                 thumbnail_image_url= 'https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo2.PNG',
@@ -184,7 +184,7 @@ def message_list(arg, info):
                 ]
             )
         )  
-        return [message1, message2, message3]
+        return [message1, message2, message3, message4]
 
     
     if arg == 'name2':
@@ -416,7 +416,7 @@ def message_list(arg, info):
                         )
                     ),
                     ImageCarouselColumn(
-                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/why.jpg',
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/why.png',
                         action=PostbackAction(
                             label='Why JUST?',
                             display_text='Info coming soon...',
@@ -434,13 +434,16 @@ def message_list(arg, info):
     
 def rich_menu(userID):        
     rich_menu_to_create = RichMenu(
-    size=RichMenuSize(width=2500, height=1600),
+    size=RichMenuSize(width=2500, height=800),
     selected=False,
     name="Nice richmenu",
     chat_bar_text="Tap here",
     areas=[
         RichMenuArea(
-        bounds=RichMenuBounds(x=0, y=0, width=2500, height=800),
+        bounds=RichMenuBounds(x=0, y=0, width=1250, height=800),
+        action=URIAction(label='Go to line.me', uri='https://line.me')), 
+        RichMenuArea(
+        bounds=RichMenuBounds(x=1250, y=0, width=1250, height=800),
         action=URIAction(label='Go to line.me', uri='https://line.me'))  
         ]
     )
