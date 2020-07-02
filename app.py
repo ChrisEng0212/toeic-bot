@@ -504,24 +504,24 @@ def handle_message(event):
     elif recruit.name == '159':
         if len(tx) < 11: 
             name = event.message.text
-            message = message_list('name', name)
+            message = message_list('nameConfirm', name)
         else:
             message = message_list('alert', None)        
         
-    elif recruit.highschool == None:
+    elif recruit.status < 3:
         if len(tx) < 11: 
             high = event.message.text
-            message = message_list('high', high)
+            message = message_list('highConfirm', high)
         else:
             message = message_list('alert', None)
-    elif recruit.number == None:
+    elif recruit.status < 4:
         if len(tx) < 11: 
             number = event.message.text
-            message = message_list('num', number)
+            message = message_list('numConfirm', number)
         else:
             message = message_list('alert', None)
     else:
-        message = message_list('gen', None)
+        message = message_list('general', None)
     
     
     print('EVENT', event)    
