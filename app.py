@@ -127,7 +127,7 @@ def text(tx):
 def message_list(arg, info):
 
     if arg == 'alert': 
-        message = TextSendMessage(text='Sorry this answer is too long, please make it shorter (<10)') 
+        message = TextSendMessage(text='Sorry this answer is too long, please make it shorter (<20)') 
         return message
         
     if arg == 'nameSet': 
@@ -496,20 +496,20 @@ def handle_message(event):
             time.sleep(4) 
             message = message_list('start2', name) 
         elif recruit.name == '159':
-            if len(tx) < 11: 
+            if len(tx) < 21: 
                 name = event.message.text
                 message = message_list('nameConfirm', name)
             else:
                 message = message_list('alert', None)        
         
     elif recruit.status < 3:
-        if len(tx) < 11: 
+        if len(tx) < 21: 
             high = event.message.text
             message = message_list('highConfirm', high)
         else:
             message = message_list('alert', None)
     elif recruit.status < 4:
-        if len(tx) < 11: 
+        if len(tx) < 21: 
             number = event.message.text
             message = message_list('numConfirm', number)
         else:
