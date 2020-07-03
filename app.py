@@ -55,8 +55,9 @@ class User(db.Model, UserMixin):
     username =  db.Column(db.String(20), unique=True, nullable=False)    
     
 
-class Recruits(db.Model):
+class Recruits(db.Model):    
     id = db.Column(db.Integer, primary_key=True) 
+    #date.....
     line = db.Column(db.String)
     name = db.Column(db.String)
     highschool = db.Column(db.String)
@@ -117,7 +118,7 @@ def data():
 @app.route('/text/<string:tx>')
 def text(tx):
     try:
-        line_bot_api.multicast(['U2dc560609e55883a4d869c88c0d912e7'], TextSendMessage(text=tx))
+        line_bot_api.multicast(['U2dc560609e55883a4d869c88c0d912e7', 'U2dc081c2670e8322666ca4d890df6562'], TextSendMessage(text=tx))
         # max 150 recipients
     except LineBotApiError as e:
         abort(400)
