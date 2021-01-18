@@ -3,6 +3,7 @@ static/.DS_Store
 static/json_files
 
 meta.py
+redisdb.py
 .env
 venv
 

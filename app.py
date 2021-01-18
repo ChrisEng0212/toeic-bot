@@ -10,7 +10,6 @@ try:
     from meta import DEBUG, channel_access_token, channel_secret, redis_pw, SECRET_KEY
 
 except:
-    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
     SECRET_KEY = os.environ['SECRET_KEY']
     DEBUG = False
     channel_access_token = os.environ['CHANNEL_ACCESS']
@@ -25,12 +24,12 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 
-# r = redis.Redis(
-#     host = 'redis-11262.c54.ap-northeast-1-2.ec2.cloud.redislabs.com',
-#     port = 11262,
-#     password = redis_pw,
-#     decode_repsonses = True # get python freiendlt format
-# )
+r = redis.Redis(
+    host = 'redis-11262.c54.ap-northeast-1-2.ec2.cloud.redislabs.com',
+    port = 11262,
+    password = redis_pw,
+    decode_responses = True # get python freiendlt format
+)
 
 # print(r)
 
@@ -54,7 +53,6 @@ def login(pw):
     if pw == 'pw':
         user = User.query.filter_by(username='Admin').first()
         print(user.username)
-        login_user(user)
         print(user, 'loggedin')
         return redirect (url_for('data'))
     else:
@@ -398,9 +396,8 @@ def follow_check(events):
 
     if events[0].type == 'follow':
         print('ID follow', newUser)
-        newRec = Recruits(line=newUser, status=1)
-        db.session.add(newRec)
-        db.session.commit()
+        newRec = {line=newUser, status=1}
+
 
         try:
             line_bot_api.unlink_rich_menu_from_user(newUser)
