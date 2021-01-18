@@ -1,24 +1,21 @@
-from flask import Flask, request, abort, render_template, url_for, flash, redirect, jsonify  
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user, login_required
-from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
+from flask import Flask, request, abort, render_template, url_for, flash, redirect, jsonify
 from datetime import datetime, timedelta
 import json
 import os
-import ast 
+import ast
 import time
+import redis
 
 try:
-    from meta import SQLALCHEMY_DATABASE_URI, SECRET_KEY, DEBUG, channel_access_token, channel_secret
+    from meta import DEBUG, channel_access_token, channel_secret, redis_pw, SECRET_KEY
 
 except:
-    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']    
-    SECRET_KEY = os.environ['SECRET_KEY']    
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    SECRET_KEY = os.environ['SECRET_KEY']
     DEBUG = False
-    channel_access_token = os.environ['CHANNEL_ACCESS'] 
-    channel_secret = os.environ['CHANNEL_SECRET'] 
- 
+    channel_access_token = os.environ['CHANNEL_ACCESS']
+    channel_secret = os.environ['CHANNEL_SECRET']
+
 
 from linebot import (
     LineBotApi, WebhookHandler, WebhookParser
@@ -28,15 +25,19 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 
+# r = redis.Redis(
+#     host = 'redis-11262.c54.ap-northeast-1-2.ec2.cloud.redislabs.com',
+#     port = 11262,
+#     password = redis_pw,
+#     decode_repsonses = True # get python freiendlt format
+# )
+
+# print(r)
+
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['DEBUG'] = DEBUG
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login' 
-login_manager.login_message_category = 'info'
 
 # Channel Access Token
 line_bot_api = LineBotApi(channel_access_token)
@@ -45,47 +46,6 @@ handler = WebhookHandler(channel_secret)
 
 parser = WebhookParser(channel_secret)
 
-
-@login_manager.user_loader
-def load_user(user_id):
-    return None
-
-class User(db.Model, UserMixin): 
-    id = db.Column(db.Integer, primary_key=True) 
-    username =  db.Column(db.String(20), unique=True, nullable=False)    
-    
-
-class Recruits(db.Model):    
-    id = db.Column(db.Integer, primary_key=True) 
-    #date.....
-    line = db.Column(db.String)
-    name = db.Column(db.String)
-    highschool = db.Column(db.String)
-    ## how did you hear about us?
-    number = db.Column(db.String)
-    dept = db.Column(db.String)
-    questions = db.Column(db.String)
-    set1 = db.Column(db.String)
-    set2 = db.Column(db.String)
-    set3 = db.Column(db.String)
-    set4 = db.Column(db.String)
-    set5 = db.Column(db.String)
-    set6 = db.Column(db.String)
-    set7 = db.Column(db.String)
-    set8 = db.Column(db.String)
-    status = db.Column(db.Integer)
-
-class MyModelView(ModelView):
-    def is_accessible(self):
-        if DEBUG == True:
-            return True
-        else:
-            return True
-
-admin = Admin(app)
-admin.add_view(MyModelView(User, db.session))
-admin.add_view(MyModelView(Recruits, db.session))
-    
 
 @app.route("/login/<string:pw>", methods=['GET','POST'])
 def login(pw):
@@ -96,18 +56,17 @@ def login(pw):
         print(user.username)
         login_user(user)
         print(user, 'loggedin')
-        return redirect (url_for('data')) 
+        return redirect (url_for('data'))
     else:
         return 'Cannot login'
 
-''' UI pages ''' 
-  
+''' UI pages '''
+
 @app.route('/')
 def home():
-    return 'Hello, World!'
+    return render_template('/home.html')
 
 @app.route('/data')
-@login_required
 def data():
     return 'Data'
 
@@ -118,8 +77,19 @@ def data():
 @app.route('/text/<string:tx>')
 def text(tx):
     try:
+        line_bot_api.multicast(['U2dc560609e55883a4d869c88c0d912e7'], TextSendMessage(text=tx))
+        # max 150 recipients
+        # what if recipient has blocked or deleted bot??
+    except LineBotApiError as e:
+        abort(400)
+    return tx
+
+@app.route('/set/<string:tx>')
+def setString(tx):
+    try:
         line_bot_api.multicast(['U2dc560609e55883a4d869c88c0d912e7', 'U2dc081c2670e8322666ca4d890df6562'], TextSendMessage(text=tx))
         # max 150 recipients
+        # what if recipient has blocked or deleted bot??
     except LineBotApiError as e:
         abort(400)
     return tx
@@ -127,32 +97,32 @@ def text(tx):
 
 def message_list(arg, info):
 
-    if arg == 'alert': 
-        message = TextSendMessage(text='Sorry this answer is too long, please make it shorter (<20)') 
+    if arg == 'alert':
+        message = TextSendMessage(text='Sorry this answer is too long, please make it shorter (<20)')
         return message
-        
-    if arg == 'nameSet': 
+
+    if arg == 'nameSet':
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png'
-        )  
-        message = TextSendMessage(text='Thanks, got it. Next, please write your highschool...') 
+        )
+        message = TextSendMessage(text='Thanks, got it. Next, please write your highschool...')
         return [image, message]
 
-    if arg == 'highSet': 
+    if arg == 'highSet':
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/phone.png',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/phone.png'
-        ) 
-        message = TextSendMessage(text='Okay, thanks. Could we have your phone number for contacting?') 
+        )
+        message = TextSendMessage(text='Okay, thanks. Could we have your phone number for contacting?')
         return [image, message]
 
-    if arg == 'numSet': 
+    if arg == 'numSet':
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/globe.png',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/globe.png'
-        ) 
-        message = TextSendMessage(text='This is going well! Now which department are you interested in?') 
+        )
+        message = TextSendMessage(text='This is going well! Now which department are you interested in?')
         confirm = TemplateSendMessage(
             alt_text='Which department?',
             template=ButtonsTemplate(
@@ -169,20 +139,20 @@ def message_list(arg, info):
                         label= 'Japanese Division',
                         display_text='Japanese Division',
                         data="['Division', 'Jpn']"
-                    ),              
+                    ),
                     PostbackAction(
                         label= 'Another Department',
                         display_text='Another Department',
                         data="['Division', 'Other']"
-                    )              
+                    )
                 ]
             )
-        )  
+        )
         return [image, message, confirm]
 
-    if arg == 'deptSet': 
-        sticker = StickerSendMessage(package_id='2', sticker_id='141')  
-        message = TextSendMessage(text='Great, all set. Now the BOT can help with any questions you might have about the Department or our Application Process')    
+    if arg == 'deptSet':
+        sticker = StickerSendMessage(package_id='2', sticker_id='141')
+        message = TextSendMessage(text='Great, all set. Now the BOT can help with any questions you might have about the Department or our Application Process')
         return [sticker, message]
 
 
@@ -190,23 +160,23 @@ def message_list(arg, info):
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/logo1.PNG'
-        )        
-        message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')  
-        sticker = StickerSendMessage(package_id='2', sticker_id='144')  
-        message2 = TextSendMessage(text='How are you today?')  
+        )
+        message1 = TextSendMessage(text='Welcome to JinWen Applied Foreign Languages Department!')
+        sticker = StickerSendMessage(package_id='2', sticker_id='144')
+        message2 = TextSendMessage(text='How are you today?')
         return [image, message1, sticker, message2]
 
     if arg == 'start1':
-        message1 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')   
-        message2 = TextSendMessage(text='First we need some simple details....')     
+        message1 = TextSendMessage(text='This BOT is here to help with any question you have about the Department or our application process')
+        message2 = TextSendMessage(text='First we need some simple details....')
         return [message1, message2]
 
-    if arg == 'start2':        
+    if arg == 'start2':
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png'
-        )  
-        message3 = TextSendMessage(text='Should we use your LINE name?') 
+        )
+        message3 = TextSendMessage(text='Should we use your LINE name?')
         message4 = TemplateSendMessage(
             alt_text='Confirm template',
             template=ConfirmTemplate(
@@ -225,10 +195,10 @@ def message_list(arg, info):
                 ]
             )
         )
-        
+
         return [image, message3, message4]
-    
-    
+
+
     if arg == 'nameConfirm':
         message = TemplateSendMessage(
             alt_text='Confirm template',
@@ -249,8 +219,8 @@ def message_list(arg, info):
             )
         )
         return message
-    
-    if arg == 'highConfirm': 
+
+    if arg == 'highConfirm':
         print('HIGH MESSAGE')
         message = TemplateSendMessage(
             alt_text='Confirm template',
@@ -271,22 +241,22 @@ def message_list(arg, info):
             )
         )
         return message
-        
-    if arg == 'numConfirm': 
+
+    if arg == 'numConfirm':
         print('NUMBER MESSAGE')
         message = TemplateSendMessage(
             alt_text='Buttons template',
             template=ConfirmTemplate(
-                text='Check Number',               
+                text='Check Number',
                 actions=[
                         PostbackAction(
                             label=info,
-                            display_text='NUMBER SET: ' + info, 
+                            display_text='NUMBER SET: ' + info,
                             data="['Num', '" + info + "']"
                         ),
                         PostbackAction(
                             label='Try again',
-                            display_text="Okay, let's try again.'", 
+                            display_text="Okay, let's try again.'",
                             data="['Num', None]"
                         )
                     ]
@@ -313,10 +283,10 @@ def message_list(arg, info):
                 ]
             )
         )
-        return message       
-        
+        return message
 
-    if arg == 'check': 
+
+    if arg == 'check':
         print('CHECK MESSAGE')
         message = TemplateSendMessage(
             alt_text='Buttons template',
@@ -327,23 +297,23 @@ def message_list(arg, info):
                 actions=[
                         PostbackAction(
                             label="All good :)",
-                            display_text="Nice, now lets think more about your future studies", 
+                            display_text="Nice, now lets think more about your future studies",
                             data="Done"
                         ),
                         PostbackAction(
                             label="Start again",
-                            display_text="No problem, from the top! 1) What is your name?", 
+                            display_text="No problem, from the top! 1) What is your name?",
                             data="Restart"
                         ),
-                        
-                                      
+
+
                     ]
                 )
             )
         return message
-    
 
-    if arg == 'general':       
+
+    if arg == 'general':
         message = TemplateSendMessage(
             alt_text='ImageCarousel template',
             template=ImageCarouselTemplate(
@@ -388,16 +358,16 @@ def message_list(arg, info):
                             data="['Why', 'None']"
                         )
                     )
-                    
+
                 ]
             )
         )
         return message
-    
-    
 
-    
-def rich_menu(userID):        
+
+
+
+def rich_menu(userID):
     rich_menu_to_create = RichMenu(
     size=RichMenuSize(width=2500, height=800),
     selected=False,
@@ -406,10 +376,10 @@ def rich_menu(userID):
     areas=[
         RichMenuArea(
         bounds=RichMenuBounds(x=0, y=0, width=1250, height=800),
-        action=URIAction(label='Go to line.me', uri='https://line.me')), 
+        action=URIAction(label='Go to line.me', uri='https://line.me')),
         RichMenuArea(
         bounds=RichMenuBounds(x=1250, y=0, width=1250, height=800),
-        action=URIAction(label='Go to line.me', uri='https://github.com/line/demo-rich-menu-bot'))  
+        action=URIAction(label='Go to line.me', uri='https://github.com/line/demo-rich-menu-bot'))
         ]
     )
     rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
@@ -417,27 +387,27 @@ def rich_menu(userID):
 
     with open('banner.png', 'rb') as f:
         line_bot_api.set_rich_menu_image(rich_menu_id, 'image/png', f)
-    
+
     'https://medium.com/enjoy-life-enjoy-coding/%E4%BD%BF%E7%94%A8-python-%E7%82%BA-line-bot-%E5%BB%BA%E7%AB%8B%E7%8D%A8%E4%B8%80%E7%84%A1%E4%BA%8C%E7%9A%84%E5%9C%96%E6%96%87%E9%81%B8%E5%96%AE-rich-menus-7a5f7f40bd1'
 
-    line_bot_api.link_rich_menu_to_user(userID, rich_menu_id)   
+    line_bot_api.link_rich_menu_to_user(userID, rich_menu_id)
 
 
 def follow_check(events):
-    newUser = events[0].source.user_id 
+    newUser = events[0].source.user_id
 
-    if events[0].type == 'follow':        
-        print('ID follow', newUser)  
+    if events[0].type == 'follow':
+        print('ID follow', newUser)
         newRec = Recruits(line=newUser, status=1)
         db.session.add(newRec)
         db.session.commit()
-       
+
         try:
-            line_bot_api.unlink_rich_menu_from_user(newUser)    
-        except: 
-            pass 
+            line_bot_api.unlink_rich_menu_from_user(newUser)
+        except:
+            pass
         line_bot_api.push_message(newUser, message_list('welcome', None))
-        return 'OK'   
+        return 'OK'
 
     if events[0].type == 'unfollow':
         print('ID unfollow', newUser)
@@ -449,12 +419,12 @@ def follow_check(events):
 
 
 @app.route("/callback", methods=['POST'])
-def callback():        
+def callback():
     print('CALLBACK')
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
     print('SIGNATURE', signature)
-            
+
     # get request body as text
     body = request.get_data(as_text=True)
     print('BODY', str(body))
@@ -462,16 +432,16 @@ def callback():
 
     # parse webhook body
     try:
-        events = parser.parse(body, signature)         
-        follow_check(events)        
+        events = parser.parse(body, signature)
+        follow_check(events)
     except InvalidSignatureError:
-        abort(400)   
-    
+        abort(400)
+
     # handle webhook body
     try:
         print('HANDLER try')
         handler.handle(body, signature)
-        print('HANDLER success')    
+        print('HANDLER success')
     except InvalidSignatureError:
         abort(400)
     return 'OK'
@@ -480,46 +450,46 @@ def callback():
 
 
 @handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):      
-  
-    #message = TextSendMessage(text=event.message.text)  
+def handle_message(event):
+
+    #message = TextSendMessage(text=event.message.text)
     userID = event.source.user_id
     recruit = Recruits.query.filter_by(line=userID).first()
 
-    tx = event.message.text    
+    tx = event.message.text
 
     if recruit.status < 2:
         profile = line_bot_api.get_profile(userID)
         name = profile.display_name
         if recruit.name == None:
-            message = message_list('start1', name) 
+            message = message_list('start1', name)
             line_bot_api.push_message(userID, message)
-            time.sleep(4) 
-            message = message_list('start2', name) 
+            time.sleep(4)
+            message = message_list('start2', name)
         elif recruit.name == '159':
-            if len(tx) < 21: 
+            if len(tx) < 21:
                 name = event.message.text
                 message = message_list('nameConfirm', name)
             else:
-                message = message_list('alert', None)        
-        
+                message = message_list('alert', None)
+
     elif recruit.status < 3:
-        if len(tx) < 21: 
+        if len(tx) < 21:
             high = event.message.text
             message = message_list('highConfirm', high)
         else:
             message = message_list('alert', None)
     elif recruit.status < 4:
-        if len(tx) < 21: 
+        if len(tx) < 21:
             number = event.message.text
             message = message_list('numConfirm', number)
         else:
             message = message_list('alert', None)
     else:
         message = message_list('general', None)
-    
-    
-    print('EVENT', event)    
+
+
+    print('EVENT', event)
     line_bot_api.reply_message(event.reply_token, message)
 
 
@@ -528,8 +498,8 @@ def handle_message(event):
 def handle_message(event, destination):
     if isinstance(event.source, SourceUser):
         print('ID', event.source.user_id) # user_id replaces userId
-    
-    print('POSTBACK', event.postback.data)   
+
+    print('POSTBACK', event.postback.data)
     data = event.postback.data
 
     if data == 'None':
@@ -537,8 +507,8 @@ def handle_message(event, destination):
         return None
     else:
         userID = event.source.user_id
-        recruit = Recruits.query.filter_by(line=userID).first() 
-    
+        recruit = Recruits.query.filter_by(line=userID).first()
+
     '''
     if data == 'Done':
         ## send message
@@ -558,64 +528,64 @@ def handle_message(event, destination):
     def push(arg):
         if arg == 1:
             time.sleep(3)
-            message = message_list('genConfirm', None)        
+            message = message_list('genConfirm', None)
             line_bot_api.push_message(userID, message)
 
-        
+
     data_list = ast.literal_eval(event.postback.data)
     print('DATALIST', data_list)
 
-    
+
     if data_list[0] == 'Name':
         if data_list[1] == '159':
-            recruit.name = data_list[1] 
+            recruit.name = data_list[1]
             message = TextSendMessage(text='Please enter your name...')
-            send(message) 
+            send(message)
         else:
-            recruit.name = data_list[1]     
-            recruit.status = 2  
+            recruit.name = data_list[1]
+            recruit.status = 2
             message = message_list('nameSet', None)
-            send(message)    
-    
+            send(message)
+
     if data_list[0] == 'High':
         if data_list[1] == None:
             message = TextSendMessage(text='Please enter your highschool...')
-            send(message) 
+            send(message)
         else:
             recruit.highschool = data_list[1]
-            recruit.status = 3  
+            recruit.status = 3
             message = message_list('highSet', None)
-            send(message)           
-    if data_list[0] == 'Num':  
+            send(message)
+    if data_list[0] == 'Num':
         if data_list[1] == None:
             message = TextSendMessage(text='Please enter your phone number...')
-            send(message) 
-        else:      
+            send(message)
+        else:
             recruit.number = data_list[1]
             recruit.status = 4
             message = message_list('numSet', None)
-            send(message)        
+            send(message)
     if data_list[0] == 'Division':
-        recruit.dept = data_list[1]  
+        recruit.dept = data_list[1]
         recruit.status = 5
         message = message_list('deptSet', None)
-        line_bot_api.push_message(userID, message)   
-        time.sleep(2) 
+        line_bot_api.push_message(userID, message)
+        time.sleep(2)
         message = message_list('general', None)
         send(message)
-        #rich_menu(userID)   
+        #rich_menu(userID)
 
-    
+
     if data_list[0] == 'Faculty':
         recruit.set1 = data_list[0]
         message = TextSendMessage(text='Faculty info coming soon...')
         send(message)
-        push(1)  
+        push(1)
     if data_list[0] == 'Courses':
         recruit.set2 = data_list[0]
         message = TextSendMessage(text='Courses info coming soon...')
-        send(message)   
-        push(1)  
+        send(message)
+        push(1)
     if data_list[0] == 'Contact':
         recruit.set3 = data_list[0]
         message = TextSendMessage(text='Here is a list of professors you can add to your LINE....')
@@ -636,31 +606,31 @@ def handle_message(event, destination):
         if data_list[1] =='Yes':
             message = message_list('general', None)
             send(message)
-        else:            
-            m1 = TextSendMessage(text='Great, thank you for paying an interest in our department.')             
+        else:
+            m1 = TextSendMessage(text='Great, thank you for paying an interest in our department.')
             m2 = TextSendMessage(text='JUST-BOT will send some useful information in the future')
             m3 = TextSendMessage(text='Just say "Hi" to get more information')
-            sticker = StickerSendMessage(package_id='2', sticker_id='159') 
-                          
+            sticker = StickerSendMessage(package_id='2', sticker_id='159')
+
             send([m1, m2, sticker, m3])
-            
-
-        
 
 
-    db.session.commit()   
-    return 'OK'  
 
-   
 
-    
+
+    db.session.commit()
+    return 'OK'
+
+
+
+
 
 @handler.add(FollowEvent)
 def handle_follow():
     print('student has joined')
 
 @handler.add(UnfollowEvent)
-def handle_unfollow():        
+def handle_unfollow():
     print('student has left')
 
 #If there is no handler for an event, this default handler method is called.
@@ -677,6 +647,6 @@ def default(event):
 
 
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     app.run(debug=True)
 
