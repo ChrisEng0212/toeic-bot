@@ -81,6 +81,7 @@ def data():
 def text(tx):
 
     destination = None
+    response = None
 
     for k in r.keys():
         if r.hget(k, 'name') == 'Chris':
@@ -88,20 +89,19 @@ def text(tx):
 
     print('DEST', destination)
 
-    line_bot_api.push_message(destination, TextSendMessage(text='Hello PUSH!'))
-    line_bot_api.broadcast(TextSendMessage(text='Hello World!'))
-    line_bot_api.multicast([destination], TextSendMessage(text=tx))
-
     try:
         line_bot_api.push_message(k, TextSendMessage(text='Hello PUSH!'))
-        line_bot_api.broadcast(TextSendMessage(text='Hello World!'))
-        line_bot_api.multicast([k], TextSendMessage(text=tx))
+        #line_bot_api.broadcast(TextSendMessage(text='Hello World!'))
+        #line_bot_api.multicast([k], TextSendMessage(text=tx))
         # max 150 recipients
         # what if recipient has blocked or deleted bot??
+        response = 'success'
     except:
         print('ABORT')
+        response = 'ABORT'
         abort(400)
-    return tx
+
+    return [tx, response]
 
 
 def message_list(arg, info):
@@ -152,7 +152,8 @@ def message_list(arg, info):
         print([image, message1, message2])
         return [image, message1, message2]
 
-    if arg == 'readySet':
+    if arg == 'readySet1':
+        print('READYSET')
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png'
@@ -163,11 +164,6 @@ def message_list(arg, info):
             template=ConfirmTemplate(
                 text='First Question',
                 actions=[
-                    PostbackAction(
-                        label='A',
-                        display_text='A............' ,
-                        data="['First', 'A']"
-                    ),
                     MessageAction(
                         label='message',
                         text='message text'
@@ -178,32 +174,40 @@ def message_list(arg, info):
         return [image, message1, message2]
 
 
-    if arg == 'general':
-        message = TemplateSendMessage(
+    if arg == 'readySet':
+        message1 = TextSendMessage(text='Please try your first question')
+        message2 = TemplateSendMessage(
             alt_text='ImageCarousel template',
             template=ImageCarouselTemplate(
                 columns=[
                     ImageCarouselColumn(
-                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/faculty.png',
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/toeic-bot/a3.png',
                         action=PostbackAction(
-                            label='Faculty',
-                            display_text='I would like to know about JUST AFLD teachers...',
-                            data="['Faculty', 'None']"
+                            label='A',
+                            display_text='answer 1',
+                            data=json.dumps(['answer', 'A', info])
                         )
                     ),
                     ImageCarouselColumn(
-                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/application.png',
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/toeic-bot/a2.png',
                         action=PostbackAction(
-                            label='Application',
-                            display_text='How can I apply for JUST AFLD?',
-                            data="['Apply', 'None']"
+                            label='B',
+                            display_text='answer 2',
+                            data=json.dumps(['answer', 'B', info])
+                        )
+                    )
+                    ImageCarouselColumn(
+                        image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/toeic-bot/a1.png',
+                        action=PostbackAction(
+                            label='C',
+                            display_text='answer 3',
+                            data=json.dumps(['answer', 'C', info])
                         )
                     )
                 ]
             )
         )
-        return message
-
+        return [message1, message2]
 
 def follow_check(events):
     newUser = events[0].source.user_id
