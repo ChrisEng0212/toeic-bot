@@ -79,18 +79,15 @@ def data():
 
 @app.route('/text/<string:tx>')
 def text(tx):
-    try:
-        line_bot_api.multicast(['U2dc560609e55883a4d869c88c0d912e7'], TextSendMessage(text=tx))
-        # max 150 recipients
-        # what if recipient has blocked or deleted bot??
-    except LineBotApiError as e:
-        abort(400)
-    return tx
 
-@app.route('/set/<string:tx>')
-def setString(tx):
+    destination = None
+
+    for k in r.keys():
+        if r.hget(k, 'name') == 'Chris':
+            destination = k
+
     try:
-        line_bot_api.multicast(['U2dc560609e55883a4d869c88c0d912e7', 'U2dc081c2670e8322666ca4d890df6562'], TextSendMessage(text=tx))
+        line_bot_api.multicast(k, TextSendMessage(text=tx))
         # max 150 recipients
         # what if recipient has blocked or deleted bot??
     except LineBotApiError as e:
@@ -235,6 +232,9 @@ def follow_check(events):
         print('ID unfollow', newUser)
         r.hset(newUser, 'status', 0)
         return True
+
+
+
 
 
 @app.route("/callback", methods=['POST'])
