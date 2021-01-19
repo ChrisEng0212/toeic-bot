@@ -195,7 +195,7 @@ def message_list(arg, info):
                             display_text='answer 2',
                             data=json.dumps(['answer', 'B', info])
                         )
-                    )
+                    ),
                     ImageCarouselColumn(
                         image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/toeic-bot/a1.png',
                         action=PostbackAction(
