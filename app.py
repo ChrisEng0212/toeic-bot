@@ -172,6 +172,29 @@ def message_list(arg, info):
 
     if arg == 'readySet':
         message1 = TextSendMessage(text='Please try your first question')
+        message2 = TextSendMessage(
+                text='Quick reply',
+                quick_reply=QuickReply(
+                    items=[
+                        QuickReplyButton(
+                            action=PostbackAction(label="A", data=json.dumps(['answer', 'A', info]))
+                        ),
+                        QuickReplyButton(
+                            action=PostbackAction(label="B", data=json.dumps(['answer', 'B', info]))
+                        ),
+                        QuickReplyButton(
+                            action=PostbackAction(label="C", data=json.dumps(['answer', 'C', info]))
+                        ),
+                        QuickReplyButton(
+                            action=PostbackAction(label="D", data=json.dumps(['answer', 'D', info]))
+                        )
+                    ]
+                )
+            )
+        return [message1, message2]
+
+    if arg == 'readySet2':
+        message1 = TextSendMessage(text='Please try your first question')
         message2 = TemplateSendMessage(
             alt_text='ImageCarousel template',
             template=ImageCarouselTemplate(
@@ -204,6 +227,28 @@ def message_list(arg, info):
             )
         )
         return [message1, message2]
+
+    if arg == 'readySet3':
+        print('READYSET')
+        image = ImageSendMessage(
+            original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
+            preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png'
+        )
+        message1 = TextSendMessage(text='Please try your first question')
+        message2 = TemplateSendMessage(
+            alt_text='Confirm template',
+            template=ConfirmTemplate(
+                text='First Question',
+                actions=[
+                    MessageAction(
+                        label='message',
+                        text='message text'
+                    ),
+                ]
+            )
+        )
+        return [image, message1, message2]
+
 
 def follow_check(events):
     newUser = events[0].source.user_id
