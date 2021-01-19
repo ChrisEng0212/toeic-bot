@@ -12,8 +12,8 @@ try:
 except:
     SECRET_KEY = os.environ['SECRET_KEY']
     DEBUG = False
-    channel_access_token = os.environ['CHANNEL_ACCESS']
-    channel_secret = os.environ['CHANNEL_SECRET']
+    channel_access_token = os.environ['channel_access_token']
+    channel_secret = os.environ['channel_secret']
 
 
 from linebot import (
@@ -221,8 +221,6 @@ def callback():
     return 'OK'
 
 
-
-
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
 
@@ -283,19 +281,6 @@ def handle_message(event, destination):
         userID = event.source.user_id
         student = r.hgetall(userID)
 
-    '''
-    if data == 'Done':
-        ## send message
-        return 'OK'
-    if data == 'Restart':
-        recruit.delete()
-        db.session.commit()
-        newRec = Recruits(line=userID, status='follow')
-        db.session.add(newRec)
-        db.session.commit()
-        return 'OK'
-    '''
-
     def send(message):
         line_bot_api.reply_message(event.reply_token, message)
 
@@ -312,12 +297,12 @@ def handle_message(event, destination):
 
     if data_list[0] == 'Name':
         if data_list[1] == '159':
-            recruit.name = data_list[1]
+            student.name = data_list[1]
             message = TextSendMessage(text='Please enter your name...')
             send(message)
         else:
-            recruit.name = data_list[1]
-            recruit.status = 2
+            student.name = data_list[1]
+            student.status = 2
             message = message_list('nameSet', None)
             send(message)
 
@@ -326,8 +311,8 @@ def handle_message(event, destination):
             message = TextSendMessage(text='Please enter your highschool...')
             send(message)
         else:
-            recruit.highschool = data_list[1]
-            recruit.status = 3
+            student.highschool = data_list[1]
+            student.status = 3
             message = message_list('highSet', None)
             send(message)
     if data_list[0] == 'Num':
@@ -335,13 +320,13 @@ def handle_message(event, destination):
             message = TextSendMessage(text='Please enter your phone number...')
             send(message)
         else:
-            recruit.number = data_list[1]
-            recruit.status = 4
+            student.number = data_list[1]
+            student.status = 4
             message = message_list('numSet', None)
             send(message)
     if data_list[0] == 'Division':
-        recruit.dept = data_list[1]
-        recruit.status = 5
+        student.dept = data_list[1]
+        student.status = 5
         message = message_list('deptSet', None)
         line_bot_api.push_message(userID, message)
         time.sleep(2)
@@ -351,27 +336,27 @@ def handle_message(event, destination):
 
 
     if data_list[0] == 'Faculty':
-        recruit.set1 = data_list[0]
+        student.set1 = data_list[0]
         message = TextSendMessage(text='Faculty info coming soon...')
         send(message)
         push(1)
     if data_list[0] == 'Courses':
-        recruit.set2 = data_list[0]
+        student.set2 = data_list[0]
         message = TextSendMessage(text='Courses info coming soon...')
         send(message)
         push(1)
     if data_list[0] == 'Contact':
-        recruit.set3 = data_list[0]
+        student.set3 = data_list[0]
         message = TextSendMessage(text='Here is a list of professors you can add to your LINE....')
         send(message)
         push(1)
     if data_list[0] == 'Why':
-        recruit.set4 = data_list[0]
+        student.set4 = data_list[0]
         message = TextSendMessage(text='Why study langauges? Why study at university? Answers coming soon....')
         send(message)
         push(1)
     if data_list[0] == 'Apply':
-        recruit.set5 = data_list[0]
+        student.set5 = data_list[0]
         message = TextSendMessage(text='Our application process is very easy. First...')
         send(message)
         push(1)
