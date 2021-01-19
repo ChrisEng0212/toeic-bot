@@ -88,6 +88,10 @@ def text(tx):
 
     print('DEST', destination)
 
+    line_bot_api.push_message(destination, TextSendMessage(text='Hello PUSH!'))
+    line_bot_api.broadcast(TextSendMessage(text='Hello World!'))
+    line_bot_api.multicast([destination], TextSendMessage(text=tx))
+
     try:
         line_bot_api.push_message(k, TextSendMessage(text='Hello PUSH!'))
         line_bot_api.broadcast(TextSendMessage(text='Hello World!'))
