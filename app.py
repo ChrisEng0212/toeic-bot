@@ -145,11 +145,6 @@ def message_list(arg, info):
                         label='mid',
                         display_text='10am and 4pm' ,
                         data="['Time', 'mid']"
-                    ),
-                    PostbackAction(
-                        label='late',
-                        display_text='11am and 5pm' ,
-                        data="['Time', 'late']"
                     )
                 ]
             )
