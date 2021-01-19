@@ -283,6 +283,10 @@ def handle_message(event):
         print('getTimes')
         message = message_list('getTimes', name)
 
+    if int(student['status']) == 3:
+        print('readySet')
+        message = message_list('readySet', name)
+
 
     print('EVENT', event)
     print('MESSAGE', message)
@@ -321,7 +325,7 @@ def handle_message(event, destination):
 
     if data_list[0] == 'Time':
         r.hset(userID, 'Time', data_list[1])
-
+        r.hset(userID, 'status', 3)
         message = message_list('readySet', None)
         send(message)
 
