@@ -137,13 +137,13 @@ def message_list(arg, info):
                 text='Times',
                 actions=[
                     PostbackAction(
-                        label='early',
-                        display_text='9am and 3pm' ,
+                        label='early: 9am and 3pm',
+                        display_text='' ,
                         data="['Time', 'early']"
                     ),
                     PostbackAction(
-                        label='mid',
-                        display_text='10am and 4pm' ,
+                        label='late: 11am and 5pm',
+                        display_text='11am and 5pm' ,
                         data="['Time', 'mid']"
                     )
                 ]
@@ -168,11 +168,10 @@ def message_list(arg, info):
                         display_text='A............' ,
                         data="['First', 'A']"
                     ),
-                    PostbackAction(
-                        label='B',
-                        display_text='B............' ,
-                        data="['First', 'B']"
-                    )
+                    MessageAction(
+                        label='message',
+                        text='message text'
+                    ),
                 ]
             )
         )
