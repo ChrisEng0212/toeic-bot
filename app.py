@@ -110,44 +110,82 @@ def message_list(arg, info):
         message2 = TextSendMessage(text='How are you today?')
         return [image, message1, sticker, message2]
 
-    if arg == 'nameSet':
+    if arg == 'getID':
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/partnership.png'
         )
-        message = TextSendMessage(text='Thanks, got it. Next, please write your highschool...')
-        return [image, message]
+        message1 = TextSendMessage(text='Please enter your student ID number eg 120123456')
 
-    if arg == 'deptSet':
-        sticker = StickerSendMessage(package_id='2', sticker_id='141')
-        message = TextSendMessage(text='Great, all set. Now the BOT can help with any questions you might have about the Department or our Application Process')
-        return [sticker, message]
+        return [image, message1]
 
-    if arg == 'start2':
+    if arg == 'getTimes':
         image = ImageSendMessage(
             original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
             preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png'
         )
-        message3 = TextSendMessage(text='Should we use your LINE name?')
-        message4 = TemplateSendMessage(
+        message1 = TextSendMessage(text='What times would you like your question?')
+        message2 = TemplateSendMessage(
             alt_text='Confirm template',
             template=ConfirmTemplate(
-                text='Name',
+                text='Times',
                 actions=[
                     PostbackAction(
-                        label=info,
-                        display_text='NAME SET: ' + info ,
-                        data="['Name', '" + info + "']"
+                        label='early',
+                        display_text='9am and 3pm' ,
+                        data="['Time', 'early']"
                     ),
                     PostbackAction(
-                        label= 'Not this',
-                        display_text='Name...',
-                        data="['Name', '159']"
+                        label='mid',
+                        display_text='10am and 4pm' ,
+                        data="['Time', 'mid']"
                     ),
+                    PostbackAction(
+                        label='late',
+                        display_text='11am and 5pm' ,
+                        data="['Time', 'late']"
+                    )
                 ]
             )
         )
-        return [image, message3, message4]
+        return [image, message1, message2]
+
+    if arg == 'readySet':
+        image = ImageSendMessage(
+            original_content_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png',
+            preview_image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/line-bot/human.png'
+        )
+        message1 = TextSendMessage(text='Please try your first question')
+        message2 = TemplateSendMessage(
+            alt_text='Confirm template',
+            template=ConfirmTemplate(
+                text='First Question',
+                actions=[
+                    PostbackAction(
+                        label='A',
+                        display_text='A............' ,
+                        data="['First', 'A']"
+                    ),
+                    PostbackAction(
+                        label='B',
+                        display_text='B............' ,
+                        data="['First', 'B']"
+                    ),
+                    PostbackAction(
+                        label='C',
+                        display_text='C............' ,
+                        data="['First', 'C']"
+                    ),
+                    PostbackAction(
+                        label='D',
+                        display_text='D............' ,
+                        data="['First', 'C']"
+                    )
+                ]
+            )
+        )
+        return [image, message1, message2]
+
 
     if arg == 'general':
         message = TemplateSendMessage(
@@ -238,35 +276,22 @@ def handle_message(event):
 
     tx = event.message.text
 
-    if int(student['status']) < 2:
+    if int(student['status']) == 1:
         profile = line_bot_api.get_profile(userID)
         name = profile.display_name
-        if student.name == None:
-            message = message_list('start1', name)
-            line_bot_api.push_message(userID, message)
-            time.sleep(4)
-            message = message_list('start2', name)
-        elif student.name == '159':
-            if len(tx) < 21:
-                name = event.message.text
-                message = message_list('nameConfirm', name)
-            else:
-                message = message_list('alert', None)
 
-    elif student.status < 3:
-        if len(tx) < 21:
-            high = event.message.text
-            message = message_list('highConfirm', high)
+        if '120' in event.message.text and len(event.message.text) == 9:
+            r.hset(userID, 'studentID', event.message.text)
+            r.hset(userID, 'status', 3)
         else:
-            message = message_list('alert', None)
-    elif student.status < 4:
-        if len(tx) < 21:
-            number = event.message.text
-            message = message_list('numConfirm', number)
-        else:
-            message = message_list('alert', None)
-    else:
-        message = message_list('general', None)
+            message = message_list('getID', event.message.text)
+
+    if int(student['status']) == 2:
+        profile = line_bot_api.get_profile(userID)
+        name = profile.display_name
+
+
+        message = message_list('getTimes', name)
 
 
     print('EVENT', event)
@@ -303,83 +328,18 @@ def handle_message(event, destination):
     print('DATALIST', data_list)
 
 
-    if data_list[0] == 'Name':
-        if data_list[1] == '159':
-            student.name = data_list[1]
-            message = TextSendMessage(text='Please enter your name...')
-            send(message)
-        else:
-            student.name = data_list[1]
-            student.status = 2
-            message = message_list('nameSet', None)
-            send(message)
+    if data_list[0] == 'Time':
+        r.hset(userID, 'Time', data_list[1])
 
-    if data_list[0] == 'High':
-        if data_list[1] == None:
-            message = TextSendMessage(text='Please enter your highschool...')
-            send(message)
-        else:
-            student.highschool = data_list[1]
-            student.status = 3
-            message = message_list('highSet', None)
-            send(message)
-    if data_list[0] == 'Num':
-        if data_list[1] == None:
-            message = TextSendMessage(text='Please enter your phone number...')
-            send(message)
-        else:
-            student.number = data_list[1]
-            student.status = 4
-            message = message_list('numSet', None)
-            send(message)
-    if data_list[0] == 'Division':
-        student.dept = data_list[1]
-        student.status = 5
-        message = message_list('deptSet', None)
-        line_bot_api.push_message(userID, message)
-        time.sleep(2)
-        message = message_list('general', None)
+        message = message_list('readySet', None)
         send(message)
-        #rich_menu(userID)
 
+    if data_list[0] == 'First':
+        r.hset(userID, 'First', data_list[1])
 
-    if data_list[0] == 'Faculty':
-        student.set1 = data_list[0]
-        message = TextSendMessage(text='Faculty info coming soon...')
+        message = 'Congrats you have answer your first question'
         send(message)
-        push(1)
-    if data_list[0] == 'Courses':
-        student.set2 = data_list[0]
-        message = TextSendMessage(text='Courses info coming soon...')
-        send(message)
-        push(1)
-    if data_list[0] == 'Contact':
-        student.set3 = data_list[0]
-        message = TextSendMessage(text='Here is a list of professors you can add to your LINE....')
-        send(message)
-        push(1)
-    if data_list[0] == 'Why':
-        student.set4 = data_list[0]
-        message = TextSendMessage(text='Why study langauges? Why study at university? Answers coming soon....')
-        send(message)
-        push(1)
-    if data_list[0] == 'Apply':
-        student.set5 = data_list[0]
-        message = TextSendMessage(text='Our application process is very easy. First...')
-        send(message)
-        push(1)
 
-    if data_list[0] == 'Gen':
-        if data_list[1] =='Yes':
-            message = message_list('general', None)
-            send(message)
-        else:
-            m1 = TextSendMessage(text='Great, thank you for paying an interest in our department.')
-            m2 = TextSendMessage(text='JUST-BOT will send some useful information in the future')
-            m3 = TextSendMessage(text='Just say "Hi" to get more information')
-            sticker = StickerSendMessage(package_id='2', sticker_id='159')
-
-            send([m1, m2, sticker, m3])
 
     return True
 
