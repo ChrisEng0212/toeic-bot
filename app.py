@@ -91,7 +91,7 @@ def text(tx):
     print('TEXT', tx)
 
 
-    line_bot_api.push_message(k, TextSendMessage(text=tx))
+    line_bot_api.push_message(destination, TextSendMessage(text=tx))
     #line_bot_api.broadcast(TextSendMessage(text='Hello World!'))
     #line_bot_api.multicast([k], TextSendMessage(text=tx))
     # max 150 recipients
