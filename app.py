@@ -87,10 +87,10 @@ def text(tx):
             destination = k
 
     try:
-        line_bot_api.multicast(k, TextSendMessage(text=tx))
+        line_bot_api.multicast([k], TextSendMessage(text=tx))
         # max 150 recipients
         # what if recipient has blocked or deleted bot??
-    except LineBotApiError as e:
+    except:
         abort(400)
     return tx
 
@@ -145,6 +145,7 @@ def message_list(arg, info):
                 ]
             )
         )
+        print([image, message1, message2])
         return [image, message1, message2]
 
     if arg == 'readySet':
@@ -272,14 +273,13 @@ def handle_message(event):
     #message = TextSendMessage(text=event.message.text)
     userID = event.source.user_id
     student = r.hgetall(userID)
+    profile = line_bot_api.get_profile(userID)
+    name = profile.display_name
     print(student)
 
     tx = event.message.text
 
     if int(student['status']) == 1:
-        profile = line_bot_api.get_profile(userID)
-        name = profile.display_name
-
         if '120' in event.message.text and len(event.message.text) == 9:
             r.hset(userID, 'studentID', event.message.text)
             r.hset(userID, 'status', 2)
@@ -287,14 +287,12 @@ def handle_message(event):
             message = message_list('getID', event.message.text)
 
     if int(student['status']) == 2:
-        profile = line_bot_api.get_profile(userID)
-        name = profile.display_name
-
-
+        print('getTimes')
         message = message_list('getTimes', name)
 
 
     print('EVENT', event)
+    print(message)
     line_bot_api.reply_message(event.reply_token, message)
 
 
