@@ -88,18 +88,14 @@ def text(tx):
             destination = k
 
     print('DEST', destination)
+    print('TEXT', tx)
 
-    try:
-        line_bot_api.push_message(k, TextSendMessage(text='Hello PUSH!'))
-        #line_bot_api.broadcast(TextSendMessage(text='Hello World!'))
-        #line_bot_api.multicast([k], TextSendMessage(text=tx))
-        # max 150 recipients
-        # what if recipient has blocked or deleted bot??
-        response = 'success'
-    except:
-        print('ABORT')
-        response = 'ABORT'
-        abort(400)
+
+    line_bot_api.push_message(k, TextSendMessage(text=tx))
+    #line_bot_api.broadcast(TextSendMessage(text='Hello World!'))
+    #line_bot_api.multicast([k], TextSendMessage(text=tx))
+    # max 150 recipients
+    # what if recipient has blocked or deleted bot??
 
     return [tx, response]
 
