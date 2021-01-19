@@ -282,7 +282,7 @@ def handle_message(event):
 
         if '120' in event.message.text and len(event.message.text) == 9:
             r.hset(userID, 'studentID', event.message.text)
-            r.hset(userID, 'status', 3)
+            r.hset(userID, 'status', 2)
         else:
             message = message_list('getID', event.message.text)
 
