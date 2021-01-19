@@ -14,6 +14,7 @@ except:
     DEBUG = False
     channel_access_token = os.environ['channel_access_token']
     channel_secret = os.environ['channel_secret']
+    redis_pw = os.environ['redis_pw']
 
 
 from linebot import (
@@ -51,9 +52,6 @@ def login(pw):
     print('LOGIN')
 
     if pw == 'pw':
-        user = User.query.filter_by(username='Admin').first()
-        print(user.username)
-        print(user, 'loggedin')
         return redirect (url_for('data'))
     else:
         return 'Cannot login'
@@ -62,7 +60,14 @@ def login(pw):
 
 @app.route('/')
 def home():
-    return render_template('/home.html')
+    data = {}
+
+    for k in r.keys():
+        data[k] = r.hgetall(k)
+
+    print(data)
+
+    return render_template('/home.html', data=data)
 
 @app.route('/data')
 def data():
@@ -182,6 +187,8 @@ def follow_check(events):
 
         r.hset(newUser, 'status', 1)
         r.hset(newUser, 'name', name)
+        r.hset(newUser, 'passed', json.dumps({}))
+        r.hset(newUser, 'failed', json.dumps({}))
 
         line_bot_api.push_message(newUser, message_list('welcome', name))
         return True
