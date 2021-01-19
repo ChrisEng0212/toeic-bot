@@ -234,10 +234,11 @@ def handle_message(event):
     #message = TextSendMessage(text=event.message.text)
     userID = event.source.user_id
     student = r.hgetall(userID)
+    print(student)
 
     tx = event.message.text
 
-    if student.status < 2:
+    if int(student['status']) < 2:
         profile = line_bot_api.get_profile(userID)
         name = profile.display_name
         if student.name == None:
