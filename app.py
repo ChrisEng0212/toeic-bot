@@ -86,11 +86,16 @@ def text(tx):
         if r.hget(k, 'name') == 'Chris':
             destination = k
 
+    print('DEST', destination)
+
     try:
+        line_bot_api.push_message(k, TextSendMessage(text='Hello PUSH!'))
+        line_bot_api.broadcast(TextSendMessage(text='Hello World!'))
         line_bot_api.multicast([k], TextSendMessage(text=tx))
         # max 150 recipients
         # what if recipient has blocked or deleted bot??
     except:
+        print('ABORT')
         abort(400)
     return tx
 
@@ -168,16 +173,6 @@ def message_list(arg, info):
                         label='B',
                         display_text='B............' ,
                         data="['First', 'B']"
-                    ),
-                    PostbackAction(
-                        label='C',
-                        display_text='C............' ,
-                        data="['First', 'C']"
-                    ),
-                    PostbackAction(
-                        label='D',
-                        display_text='D............' ,
-                        data="['First', 'C']"
                     )
                 ]
             )
@@ -292,7 +287,7 @@ def handle_message(event):
 
 
     print('EVENT', event)
-    print(message)
+    print('MESSAGE', message)
     line_bot_api.reply_message(event.reply_token, message)
 
 
