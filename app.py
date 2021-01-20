@@ -134,7 +134,7 @@ def message_list(arg, info):
                 actions=[
                     PostbackAction(
                         label='early: 9am and 3pm',
-                        display_text='' ,
+                        display_text='9am and 3pm' ,
                         data="['Time', 'early']"
                     ),
                     PostbackAction(
@@ -169,24 +169,41 @@ def message_list(arg, info):
         )
         return [image, message1, message2]
 
+    answerDict = {
+        1: { 'q': '‘Most of’ the large industries ‘in the’ country ‘are’ well organised and structured and are sometimes ‘backed up’ internationally reputable mother companies.',
+             'a': 'D'
+             'c': { 'A': 'Most of',
+                    'B':'in the',
+                    'C' : 'are',
+                    'D' : 'backed up'
+             },
+             'e': ["'are sometimes backed up' is using PASSIVE VOICE, so it would need 'by' --> 'are backed up internationally by' ", "most of ____s, 'the country', 'industires are'"
+    }
+
+
+    question  = 1
 
     if arg == 'readySet':
         message1 = TextSendMessage(text='Please try your first question')
         message2 = TextSendMessage(
-                text='Quick reply',
+                text='Question........',
                 quick_reply=QuickReply(
                     items=[
                         QuickReplyButton(
-                            action=PostbackAction(label="A", data=json.dumps(['answer', 'A', info]))
+                            image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/toeic-bot/a2.png'
+                            action=PostbackAction(label="answer1", data=json.dumps(['answer', question, 'A']))
                         ),
                         QuickReplyButton(
-                            action=PostbackAction(label="B", data=json.dumps(['answer', 'B', info]))
+                            image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/toeic-bot/a3.png'
+                            action=PostbackAction(label="answer2", data=json.dumps(['answer', question, 'B']))
                         ),
                         QuickReplyButton(
-                            action=PostbackAction(label="C", data=json.dumps(['answer', 'C', info]))
+                            image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/toeic-bot/a2.png'
+                            action=PostbackAction(label="answer3", data=json.dumps(['answer', question, 'C']))
                         ),
                         QuickReplyButton(
-                            action=PostbackAction(label="D", data=json.dumps(['answer', 'D', info]))
+                            image_url='https://lms-tester.s3-ap-northeast-1.amazonaws.com/toeic-bot/a3.png'
+                            action=PostbackAction(label="answer4", data=json.dumps(['answer', question, 'D']))
                         )
                     ]
                 )
@@ -204,7 +221,7 @@ def message_list(arg, info):
                         action=PostbackAction(
                             label='A',
                             display_text='answer 1',
-                            data=json.dumps(['answer', 'A', info])
+                            data=json.dumps(['answer', '1', 'A', info])
                         )
                     ),
                     ImageCarouselColumn(
@@ -271,9 +288,6 @@ def follow_check(events):
         print('ID unfollow', newUser)
         r.hset(newUser, 'status', 0)
         return True
-
-
-
 
 
 @app.route("/callback", methods=['POST'])
@@ -372,6 +386,25 @@ def handle_message(event, destination):
         r.hset(userID, 'Time', data_list[1])
         r.hset(userID, 'status', 3)
         message = message_list('readySet', None)
+        send(message)
+
+    if data_list[0] == 'answer':
+        question = data_list[1]
+        answer = data_list[2]
+
+        correct = False
+        ## check if answer is correct
+
+        if correct:
+            pDict = json.loads(student['passed'])
+            pDict[question] = str(date.today())
+            r.hset(userID, 'passed', json.dumps(pDict)
+        else:
+            fDict = json.loads(student['failed'])
+            fDict[question] = [answer, str(date.today())]
+            r.hset(userID, 'failed', json.dumps(pDict)
+
+        message = 'Congrats you have answered your first question'
         send(message)
 
     if data_list[0] == 'First':
